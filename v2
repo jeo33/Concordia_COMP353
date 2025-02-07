@@ -1,0 +1,280 @@
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Team;
+DROP TABLE IF EXISTS Membership;
+DROP TABLE IF EXISTS Period;
+DROP TABLE IF EXISTS Payments;
+DROP TABLE IF EXISTS ClubMembers;
+DROP TABLE IF EXISTS FamilyMembers;
+DROP TABLE IF EXISTS Personnel;
+DROP TABLE IF EXISTS Locations;
+DROP TABLE IF EXISTS PersonalInfo;
+DROP TABLE IF EXISTS Address;
+DROP TABLE IF EXISTS Employee;
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+# command here:
+-- Create Address Table
+CREATE TABLE Address (
+  AddressID INT AUTO_INCREMENT PRIMARY KEY,
+  StreetAddress VARCHAR(255),
+  City VARCHAR(100),
+  Province VARCHAR(100),
+  PostalCode VARCHAR(10)
+);
+
+-- Create PersonalInfo Table
+CREATE TABLE PersonalInfo (
+  PersonalInfoID INT AUTO_INCREMENT PRIMARY KEY,
+  FirstName VARCHAR(100),
+  LastName VARCHAR(100),
+  DateOfBirth DATE,
+  SSN CHAR(9) UNIQUE NOT NULL,
+  MedicareCardNumber VARCHAR(20) UNIQUE NOT NULL,
+  PhoneNumber VARCHAR(20)
+);
+
+-- Create Locations Table (Address as Foreign Key)
+CREATE TABLE Locations (
+  LocationID INT AUTO_INCREMENT PRIMARY KEY,
+  LocationName VARCHAR(100),
+  LocationType ENUM('Head', 'Branch'),
+  AddressID INT,       -- Foreign Key to Address
+  PhoneNumber VARCHAR(20),
+  WebAddress VARCHAR(100),
+  Capacity INT,
+  FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
+);
+
+-- Create Personnel Table
+CREATE TABLE Personnel (
+  PersonnelID INT AUTO_INCREMENT PRIMARY KEY,
+  PersonalInfoID INT,  -- Foreign Key to PersonalInfo
+  AddressID INT,       -- Foreign Key to Address
+  LocationID INT,
+  StartDate DATE,
+  EndDate DATE,
+  FOREIGN KEY (PersonalInfoID) REFERENCES PersonalInfo(PersonalInfoID),
+  FOREIGN KEY (AddressID) REFERENCES Address(AddressID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+
+-- Create Employee Table (inherits from Personnel)
+CREATE TABLE Employee (
+  LocationID INT,
+  Role VARCHAR(100),
+  EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
+  PersonnelID INT,  -- Foreign Key to Personnel
+  FOREIGN KEY (PersonnelID) REFERENCES Personnel(PersonnelID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
+  Status ENUM('Active', 'Inactive')
+);
+
+-- Create FamilyMembers Table
+CREATE TABLE FamilyMembers (
+  FamilyMemberID INT AUTO_INCREMENT PRIMARY KEY,
+  PersonalInfoID INT,  -- Foreign Key to PersonalInfo
+  AddressID INT,       -- Foreign Key to Address
+  LocationID INT,
+  Relationship ENUM('Father', 'Mother', 'Grandfather', 'Grandmother', 'Tutor', 'Partner', 'Friend', 'Other'),
+  FOREIGN KEY (PersonalInfoID) REFERENCES PersonalInfo(PersonalInfoID),
+  FOREIGN KEY (AddressID) REFERENCES Address(AddressID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+
+-- Create ClubMembers Table
+CREATE TABLE ClubMembers (
+  MemberID INT AUTO_INCREMENT PRIMARY KEY,
+  PersonalInfoID INT,  -- Foreign Key to PersonalInfo
+  AddressID INT,       -- Foreign Key to Address
+  FamilyMemberID INT,  -- Foreign Key to FamilyMembers
+  Age INT,
+  Status ENUM('Active', 'Inactive'),
+  LocationID INT,
+  FOREIGN KEY (PersonalInfoID) REFERENCES PersonalInfo(PersonalInfoID),
+  FOREIGN KEY (AddressID) REFERENCES Address(AddressID),
+  FOREIGN KEY (FamilyMemberID) REFERENCES FamilyMembers(FamilyMemberID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+
+-- Create Period Table (for Events)
+CREATE TABLE Period (
+  PeriodID INT AUTO_INCREMENT PRIMARY KEY,
+  StartDate DATE,
+  EndDate DATE
+);
+
+-- Create Payments Table with Period Foreign Key
+CREATE TABLE Payments (
+  PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+  MemberID INT,
+  PaymentDate DATE,
+  Amount DECIMAL(10, 2),
+  PaymentMethod ENUM('Cash', 'Debit', 'Credit'),
+  PaymentYear INT,
+  PeriodID INT,  -- Foreign Key to Period
+  FOREIGN KEY (MemberID) REFERENCES ClubMembers(MemberID),
+  FOREIGN KEY (PeriodID) REFERENCES Period(PeriodID)
+);
+
+-- Create Membership Table
+CREATE TABLE Membership (
+  MembershipID INT AUTO_INCREMENT PRIMARY KEY,
+  MemberID INT,  -- Foreign Key to ClubMembers
+  PeriodID INT,  -- Foreign Key to Period
+  Status ENUM('Active', 'Inactive'),
+  FOREIGN KEY (MemberID) REFERENCES ClubMembers(MemberID),
+  FOREIGN KEY (PeriodID) REFERENCES Period(PeriodID)
+);
+
+-- Create Team Table
+CREATE TABLE Team (
+  TeamID INT AUTO_INCREMENT PRIMARY KEY,
+  LocationID INT,       -- Foreign Key to Locations
+  TeamType ENUM('Boys', 'Girls'),
+  TeamName VARCHAR(100),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+-- Sample records for Address Table
+
+INSERT INTO Address (StreetAddress, City, Province, PostalCode) VALUES
+('123 Main St', 'Toronto', 'Ontario', 'M5A 1A1'),
+('456 Elm St', 'Vancouver', 'BC', 'V6B 2B2'),
+('789 Pine St', 'Calgary', 'Alberta', 'T2P 3P3'),
+('101 Maple St', 'Ottawa', 'Ontario', 'K1A 0B1'),
+('202 Oak St', 'Montreal', 'Quebec', 'H3B 4B2'),
+('303 Birch St', 'Edmonton', 'Alberta', 'T5J 2J2'),
+('404 Cedar St', 'Winnipeg', 'Manitoba', 'R3C 3P3'),
+('505 Walnut St', 'Halifax', 'Nova Scotia', 'B3J 1J1'),
+('606 Pineapple St', 'Quebec City', 'Quebec', 'G1A 1A1'),
+('707 Chestnut St', 'London', 'Ontario', 'N5Y 4P4');
+
+
+INSERT INTO Address (StreetAddress, City, Province, PostalCode) VALUES
+('101 Oak Ave', 'Montreal', 'Quebec', 'H3Z 2Y7'),
+('202 Pine Rd', 'Ottawa', 'Ontario', 'K2P 1Z9'),
+('303 Birch Blvd', 'Toronto', 'Ontario', 'M5T 2B3'),
+('404 Cedar Ln', 'Vancouver', 'BC', 'V6Z 1B4');
+-- Sample records for PersonalInfo Table
+INSERT INTO PersonalInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber) VALUES
+('John', 'Doe', '1985-06-15', '123456789', '1234567890', '416-555-1234'),
+('Jane', 'Smith', '1990-08-25', '987654321', '9876543210', '604-555-2345'),
+('Jane', 'Smith JR', '2012-08-25', '987651321', '9876513210', '604-555-2345');
+INSERT INTO PersonalInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber) VALUES
+('Olivia', 'Anderson', '1997-09-14', '334455667', '3344556677', '613-555-8901'),
+('William', 'Thomas', '1992-12-30', '667788990', '6677889900', '519-555-9012'),
+('Sophia', 'Jackson', '2000-05-05', '445566778', '4455667788', '647-555-0123');
+
+
+-- Sample records for Locations Table
+INSERT INTO Locations (LocationName, LocationType, AddressID, PhoneNumber, WebAddress, Capacity) VALUES
+('Head Office', 'Head', 1, '416-555-1234', 'www.headoffice.com', 200),
+('Branch Office A', 'Branch', 2, '604-555-2345', 'www.brancha.com', 150),
+('Branch Office B', 'Branch', 3, '403-555-3456', 'www.branchb.com', 100),
+('Main Campus', 'Head', 4, '514-555-4567', 'www.maincampus.com', 500),
+('Branch C', 'Branch', 5, '905-555-5678', 'www.branchc.com', 75),
+('Training Center', 'Head', 6, '416-555-6789', 'www.trainingcenter.com', 300),
+('North Office', 'Branch', 7, '204-555-7890', 'www.northoffice.com', 120),
+('South Office', 'Branch', 8, '613-555-8901', 'www.southoffice.com', 80),
+('East Office', 'Branch', 9, '519-555-9012', 'www.eastoffice.com', 60),
+('West Office', 'Branch', 10, '647-555-0123', 'www.westoffice.com', 90);
+
+
+
+
+-- Sample records for Personnel Table
+INSERT INTO Personnel (PersonalInfoID, AddressID, LocationID, StartDate, EndDate) VALUES
+(1, 11, 1, '2020-01-01', '2023-01-01'),
+(2, 12, 1, '2019-06-15', '2022-06-15'),
+(3, 13, 1, '2018-09-10', '2021-09-10');
+INSERT INTO Personnel (PersonalInfoID, AddressID, LocationID, StartDate, EndDate) VALUES
+(4, 1, 1, '2020-01-01', '2023-01-01'),
+(5, 1, 1, '2019-06-15', '2022-06-15'),
+(6, 1, 1, '2018-09-10', '2021-09-10');
+
+-- Sample records for Employee Table
+INSERT INTO Employee (LocationID, Role, PersonnelID, Status) VALUES
+(1, 'Manager', 1, 'Active'),
+(2, 'Assistant', 2, 'Inactive');
+
+-- Sample records for FamilyMembers Table
+INSERT INTO FamilyMembers (PersonalInfoID, AddressID, LocationID, Relationship) VALUES
+(1, 1, 1, 'Father'),
+(2, 2, 2, 'Mother'),
+(3, 3, 3, 'Grandfather'),
+(4, 4, 4, 'Grandmother'),
+(5, 5, 5, 'Partner'),
+(6, 6, 6, 'Friend'),
+(7, 7, 7, 'Other'),
+(8, 8, 8, 'Father'),
+(9, 9, 9, 'Mother'),
+(10, 10, 10, 'Grandfather');
+INSERT INTO FamilyMembers (PersonalInfoID, AddressID, LocationID, Relationship) VALUES
+(2, 1, 1, 'Father');
+-- Sample records for ClubMembers Table
+INSERT INTO ClubMembers (PersonalInfoID, AddressID, FamilyMemberID, Age, Status, LocationID) VALUES
+(1, 1, 1, 35, 'Active', 1),
+(2, 2, 2, 30, 'Inactive', 2),
+(3, 3, 3, 40, 'Active', 3),
+(4, 4, 4, 28, 'Active', 4),
+(5, 5, 5, 32, 'Inactive', 5),
+(6, 6, 6, 29, 'Active', 6),
+(7, 7, 7, 25, 'Active', 7),
+(8, 8, 8, 26, 'Inactive', 8),
+(9, 9, 9, 27, 'Active', 9),
+(10, 10, 10, 31, 'Active', 10);
+
+-- Sample records for Period Table
+INSERT INTO Period (StartDate, EndDate) VALUES
+('2023-01-01', '2023-12-31'),
+('2022-06-01', '2022-12-31'),
+('2021-01-01', '2021-12-31'),
+('2020-03-01', '2020-11-30'),
+('2019-07-01', '2019-12-31'),
+('2021-01-01', '2021-12-31'),
+('2022-02-01', '2022-11-30'),
+('2023-03-01', '2023-12-31'),
+('2020-01-01', '2020-12-31'),
+('2024-01-01', '2024-12-31');
+
+-- Sample records for Payments Table
+INSERT INTO Payments (MemberID, PaymentDate, Amount, PaymentMethod, PaymentYear, PeriodID) VALUES
+(1, '2023-01-15', 100.00, 'Credit', 2023, 1),
+(2, '2022-07-20', 150.00, 'Debit', 2022, 2),
+(3, '2021-03-05', 120.00, 'Cash', 2021, 3),
+(4, '2020-09-10', 200.00, 'Credit', 2020, 4),
+(5, '2019-08-25', 50.00, 'Debit', 2019, 5),
+(6, '2021-11-11', 75.00, 'Cash', 2021, 6),
+(7, '2022-06-14', 110.00, 'Credit', 2022, 7),
+(8, '2023-02-18', 140.00, 'Debit', 2023, 8),
+(9, '2020-12-05', 85.00, 'Cash', 2020, 9),
+(10, '2024-03-12', 160.00, 'Credit', 2024, 10);
+
+-- Sample records for Membership Table
+INSERT INTO Membership (MemberID, PeriodID, Status) VALUES
+(1, 1, 'Active'),
+(2, 2, 'Inactive'),
+(3, 3, 'Active'),
+(4, 4, 'Active'),
+(5, 5, 'Inactive'),
+(6, 6, 'Active'),
+(7, 7, 'Active'),
+(8, 8, 'Inactive'),
+(9, 9, 'Active'),
+(10, 10, 'Active');
+
+-- Sample records for Team Table
+INSERT INTO Team (LocationID, TeamType, TeamName) VALUES
+(1, 'Boys', 'Head Office Boys Team'),
+(2, 'Girls', 'Branch A Girls Team'),
+(3, 'Boys', 'Branch B Boys Team'),
+(4, 'Girls', 'Main Campus Girls Team'),
+(5, 'Boys', 'Branch C Boys Team'),
+(6, 'Girls', 'Training Center Girls Team'),
+(7, 'Boys', 'North Office Boys Team'),
+(8, 'Girls', 'South Office Girls Team'),
+(9, 'Boys', 'East Office Boys Team'),
+(10, 'Girls', 'West Office Girls Team');
+
+
+select * from Locations;
