@@ -1,0 +1,86 @@
+select * from Address;
+select * from  Team;
+select * from  Membership;
+select * from  Period;
+select * from  Payments;
+select * from  ClubMembers;
+select * from  FamilyMembers;
+select * from  Personnel;
+select * from  Locations;
+select * from  PersonalInfo;
+select * from  Employee;
+select * 
+from Address a,Locations l
+where a.AddressID=l.AddressID;
+UPDATE Locations
+SET LocationType = 'Branch'
+WHERE LocationType = 'Head' and Locations.LocationID>1;
+INSERT INTO Address (StreetAddress, City, Province, PostalCode) VALUES
+('123 Main St', 'Toronto', 'Ontario', 'M5A 1A1'),
+('456 Elm St', 'Vancouver', 'BC', 'V6B 2B2'),
+('789 Pine St', 'Calgary', 'Alberta', 'T2P 3P3'),
+('101 Maple St', 'Ottawa', 'Ontario', 'K1A 0B1'),
+('202 Oak St', 'Montreal', 'Quebec', 'H3B 4B2'),
+('303 Birch St', 'Edmonton', 'Alberta', 'T5J 2J2'),
+('404 Cedar St', 'Winnipeg', 'Manitoba', 'R3C 3P3'),
+('505 Walnut St', 'Halifax', 'Nova Scotia', 'B3J 1J1'),
+('606 Pineapple St', 'Quebec City', 'Quebec', 'G1A 1A1'),
+('707 Chestnut St', 'London', 'Ontario', 'N5Y 4P4');
+
+INSERT INTO PersonalInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber) VALUES
+('John', 'Doe', '1985-06-15', '123456789', '1234567890', '416-555-1234'),
+('Jane', 'Smith', '1990-08-25', '987654321', '9876543210', '604-555-2345'),
+('Robert', 'Johnson', '1982-04-05', '112233445', '1122334455', '403-555-3456'),
+('Emily', 'Davis', '1995-02-13', '556677889', '5566778899', '514-555-4567'),
+('Michael', 'Wilson', '1988-11-22', '998877665', '9988776655', '905-555-5678'),
+('Sarah', 'Taylor', '1993-03-30', '223344556', '2233445566', '416-555-6789'),
+('James', 'Martinez', '1980-07-19', '778899001', '7788990011', '204-555-7890'),
+('Olivia', 'Anderson', '1997-09-14', '334455667', '3344556677', '613-555-8901'),
+('William', 'Thomas', '1992-12-30', '667788990', '6677889900', '519-555-9012'),
+('Sophia', 'Jackson', '2000-05-05', '445566778', '4455667788', '647-555-0123');
+
+INSERT INTO Locations (LocationName, LocationType, AddressID, PhoneNumber, WebAddress, Capacity) VALUES
+('Head Office', 'Head', 1, '416-555-1234', 'www.headoffice.com', 200),
+('Branch Office A', 'Branch', 2, '604-555-2345', 'www.brancha.com', 150);
+INSERT INTO Personnel (PersonalInfoID, AddressID, LocationID, StartDate, EndDate)
+VALUES (1, 3, 1, '2021-01-01', '2022-01-01'),
+       (2, 4, 1, '2021-02-01', '2022-02-01');
+
+-- add manager
+INSERT INTO Employee (LocationID, Role, PersonnelID, Status) 
+VALUES (1, 'Manager', 1, 'Active'),
+       (1, 'Assistant', 2, 'Active');
+
+
+INSERT INTO FamilyMembers (PersonalInfoID, AddressID, LocationID, Relationship) VALUES
+(3, 5, 1, 'Father'),
+(4, 5, 1, 'Mother');
+
+INSERT INTO ClubMembers (PersonalInfoID, AddressID, FamilyMemberID, Age, Status, LocationID) VALUES
+(5, 5, 1, 18, 'Active', 1),
+(6, 5, 2, 16, 'Inactive', 2);
+
+
+INSERT INTO Period (StartDate, EndDate) VALUES
+('2023-01-01', '2023-12-31'),
+('2022-06-01', '2022-12-31'),
+('2021-01-01', '2021-12-31');
+
+INSERT INTO Payments (MemberID, PaymentDate, Amount, PaymentMethod, PaymentYear, PeriodID) VALUES
+(1, '2023-01-15', 100.00, 'Credit', 2023, 1),
+(2, '2022-07-20', 150.00, 'Debit', 2022, 2);
+
+
+INSERT INTO Membership (MemberID, PeriodID, Status) VALUES
+(1, 1, 'Active'),
+(2, 2, 'Inactive');
+
+INSERT INTO Team (LocationID, TeamType, TeamName) VALUES
+(1, 'Boys', 'Head Office Boys Team'),
+(1, 'Girls', 'Head Office  Girls Team');
+
+
+
+
+
+
