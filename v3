@@ -1,0 +1,379 @@
+-- v3
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Team;
+DROP TABLE IF EXISTS Membership;
+DROP TABLE IF EXISTS Period;
+DROP TABLE IF EXISTS Payments;
+DROP TABLE IF EXISTS ClubMembers;
+DROP TABLE IF EXISTS FamilyMembers;
+DROP TABLE IF EXISTS Personnel;
+DROP TABLE IF EXISTS Locations;
+DROP TABLE IF EXISTS PersonalInfo;
+DROP TABLE IF EXISTS Address;
+DROP TABLE IF EXISTS Employee;
+SET FOREIGN_KEY_CHECKS = 1;
+-- Table: Locations
+CREATE TABLE Locations (
+    location_id INT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('Head', 'Branch') NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    province VARCHAR(50),
+    postal_code VARCHAR(10),
+    phone_number VARCHAR(15),
+    web_address VARCHAR(255),
+    max_capacity INT
+);
+
+-- Table: Personnel
+CREATE TABLE Personnel (
+    personnel_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    date_of_birth DATE,
+    ssn VARCHAR(20) UNIQUE NOT NULL,
+    medicare_card VARCHAR(20) UNIQUE NOT NULL,
+    phone_number VARCHAR(15),
+    address VARCHAR(255),
+    city VARCHAR(100),
+    province VARCHAR(50),
+    postal_code VARCHAR(10),
+    email VARCHAR(100),
+    role ENUM('Administrator', 'General Manager', 'Deputy Manager', 'Treasurer', 'Secretary', 'Coach', 'Assistant Coach', 'Other') NOT NULL,
+    mandate ENUM('Volunteer', 'Salaried') NOT NULL,
+    location_id INT,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+);
+
+-- Table: Family Members
+CREATE TABLE FamilyMembers (
+    family_member_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    date_of_birth DATE,
+    ssn VARCHAR(20) UNIQUE NOT NULL,
+    medicare_card VARCHAR(20) UNIQUE NOT NULL,
+    phone_number VARCHAR(15),
+    address VARCHAR(255),
+    city VARCHAR(100),
+    province VARCHAR(50),
+    postal_code VARCHAR(10),
+    email VARCHAR(100),
+    location_id INT,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+);
+
+-- Table: Club Members
+CREATE TABLE ClubMembers (
+    club_member_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    date_of_birth DATE,
+    height DECIMAL(5,2),
+    weight DECIMAL(5,2),
+    ssn VARCHAR(20) UNIQUE NOT NULL,
+    medicare_card VARCHAR(20) UNIQUE NOT NULL,
+    phone_number VARCHAR(15),
+    address VARCHAR(255),
+    city VARCHAR(100),
+    province VARCHAR(50),
+    postal_code VARCHAR(10),
+    family_member_id INT,
+    FOREIGN KEY (family_member_id) REFERENCES FamilyMembers(family_member_id),
+    location_id INT,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+);
+
+-- Table: Payments
+CREATE TABLE Payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    club_member_id INT,
+    payment_date DATE,
+    amount DECIMAL(10,2),
+    payment_method ENUM('Cash', 'Debit Card', 'Credit Card') NOT NULL,
+    membership_year INT,
+    FOREIGN KEY (club_member_id) REFERENCES ClubMembers(club_member_id)
+);
+
+-- Table: Teams
+CREATE TABLE Teams (
+    team_id INT AUTO_INCREMENT PRIMARY KEY,
+    team_name VARCHAR(100) NOT NULL,
+    location_id INT,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+);
+
+-- Table: ClubMember_Teams (Many-to-Many Relationship)
+CREATE TABLE ClubMember_Teams (
+    club_member_id INT,
+    team_id INT,
+    PRIMARY KEY (club_member_id, team_id),
+    FOREIGN KEY (club_member_id) REFERENCES ClubMembers(club_member_id),
+    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
+);
+
+-- Table: Personnel_Teams (Many-to-Many Relationship)
+CREATE TABLE Personnel_Teams (
+    personnel_id INT,
+    team_id INT,
+    PRIMARY KEY (personnel_id, team_id),
+    FOREIGN KEY (personnel_id) REFERENCES Personnel(personnel_id),
+    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
+);
+
+-- Table: Membership
+CREATE TABLE Membership (
+    membership_id INT AUTO_INCREMENT PRIMARY KEY,
+    club_member_id INT,
+    start_date DATE,
+    end_date DATE,
+    FOREIGN KEY (club_member_id) REFERENCES ClubMembers(club_member_id)
+);
+ALTER TABLE Membership DROP COLUMN membership_id;
+
+
+
+
+
+-- here are the tuples:
+
+INSERT INTO Locations (type, name, address, city, province, postal_code, phone_number, web_address, max_capacity) VALUES
+-- Head Office
+('Head', 'Montreal Head Office', '123 Main St', 'Montreal', 'QC', 'H3A1B2', '514-123-4567', 'www.myvc.com', 500),
+
+-- Branches
+('Branch', 'Laval Branch', '456 Elm St', 'Laval', 'QC', 'H7A2B3', '450-987-6543', 'www.myvc.com/laval', 300),
+('Branch', 'Quebec City Branch', '789 Pine St', 'Quebec City', 'QC', 'G1A2B3', '418-456-7890', 'www.myvc.com/quebec', 250),
+('Branch', 'Toronto Branch', '101 Maple Ave', 'Toronto', 'ON', 'M5A3B4', '416-555-1234', 'www.myvc.com/toronto', 350),
+('Branch', 'Ottawa Branch', '222 Birch Rd', 'Ottawa', 'ON', 'K1A4B5', '613-234-5678', 'www.myvc.com/ottawa', 200),
+('Branch', 'Vancouver Branch', '333 Cedar St', 'Vancouver', 'BC', 'V6B5C6', '604-876-5432', 'www.myvc.com/vancouver', 280),
+('Branch', 'Calgary Branch', '444 Oak Dr', 'Calgary', 'AB', 'T2G3H7', '403-678-9012', 'www.myvc.com/calgary', 220),
+('Branch', 'Edmonton Branch', '555 Willow Blvd', 'Edmonton', 'AB', 'T5J2K9', '780-321-6543', 'www.myvc.com/edmonton', 190),
+('Branch', 'Winnipeg Branch', '666 Aspen Ct', 'Winnipeg', 'MB', 'R3C4L8', '204-987-6543', 'www.myvc.com/winnipeg', 170),
+('Branch', 'Halifax Branch', '777 Fir Ln', 'Halifax', 'NS', 'B3H1A9', '902-456-7891', 'www.myvc.com/halifax', 160);
+
+
+INSERT INTO Personnel (first_name, last_name, date_of_birth, ssn, medicare_card, phone_number, address, city, province, postal_code, email, role, mandate, location_id) VALUES
+-- Head Office Staff
+('John', 'Doe', '1980-05-15', '123-45-6789', 'M123456789', '514-555-1234', '789 Pine St', 'Montreal', 'QC', 'H3B4C5', 'johndoe@myvc.com', 'General Manager', 'Salaried', 1),
+('Sarah', 'Johnson', '1985-08-20', '234-56-7890', 'M234567890', '514-555-5678', '567 Oak St', 'Montreal', 'QC', 'H3B5D6', 'sarahjohnson@myvc.com', 'Administrator', 'Salaried', 1),
+('Michael', 'Smith', '1990-02-12', '345-67-8901', 'M345678901', '514-555-6789', '123 Maple St', 'Montreal', 'QC', 'H3B6E7', 'michaelsmith@myvc.com', 'Treasurer', 'Salaried', 1),
+
+-- Branch Coaches & Support Staff
+('Robert', 'Brown', '1975-07-22', '456-78-9012', 'M456789012', '450-555-2345', '101 Elm St', 'Laval', 'QC', 'H7A2B3', 'robertbrown@myvc.com', 'Coach', 'Salaried', 2),
+('Emily', 'Davis', '1988-11-03', '567-89-0123', 'M567890123', '418-555-3456', '222 Birch Rd', 'Quebec City', 'QC', 'G1A2B3', 'emilydavis@myvc.com', 'Assistant Coach', 'Volunteer', 3),
+('David', 'Wilson', '1983-06-25', '678-90-1234', 'M678901234', '416-555-4567', '333 Cedar St', 'Toronto', 'ON', 'M5A3B4', 'davidwilson@myvc.com', 'Administrator', 'Salaried', 4),
+('Jessica', 'Taylor', '1992-09-10', '789-01-2345', 'M789012345', '613-555-5678', '444 Oak Dr', 'Ottawa', 'ON', 'K1A4B5', 'jessicataylor@myvc.com', 'Coach', 'Salaried', 5),
+('William', 'Anderson', '1980-03-18', '890-12-3456', 'M890123456', '604-555-6789', '555 Willow Blvd', 'Vancouver', 'BC', 'V6B5C6', 'williamanderson@myvc.com', 'Coach', 'Salaried', 6),
+('Sophia', 'Martinez', '1995-12-01', '901-23-4567', 'M901234567', '403-555-7890', '666 Aspen Ct', 'Calgary', 'AB', 'T2G3H7', 'sophiamartinez@myvc.com', 'Assistant Coach', 'Volunteer', 7),
+('Daniel', 'Harris', '1987-04-30', '012-34-5678', 'M012345678', '902-555-8901', '777 Fir Ln', 'Halifax', 'NS', 'B3H1A9', 'danielharris@myvc.com', 'Deputy Manager', 'Salaried', 10);
+INSERT INTO FamilyMembers (first_name, last_name, date_of_birth, ssn, medicare_card, phone_number, address, city, province, postal_code, email, location_id) VALUES
+-- Family Members for Montreal Location
+('Alice', 'Smith', '1975-07-20', '987-65-4321', 'M987654321', '514-666-7890', '101 Maple Ave', 'Montreal', 'QC', 'H3C5D6', 'alicesmith@email.com', 1),
+('Tom', 'Johnson', '1980-01-15', '654-32-1987', 'M654321987', '514-777-1234', '456 Cedar Rd', 'Montreal', 'QC', 'H3A4B7', 'tomjohnson@email.com', 1),
+
+-- Family Members for Laval Location
+('Laura', 'Brown', '1970-05-10', '345-67-8912', 'M345678912', '450-888-5678', '789 Elm St', 'Laval', 'QC', 'H7B2C3', 'laurabrown@email.com', 2),
+('Kevin', 'Wilson', '1978-09-03', '234-56-7891', 'M234567891', '450-999-2345', '101 Birch Rd', 'Laval', 'QC', 'H7A1B2', 'kevinwilson@email.com', 2),
+
+-- Family Members for Quebec City Location
+('Emily', 'Davis', '1982-11-25', '123-45-6789', 'M123456789', '418-555-7890', '222 Maple Rd', 'Quebec City', 'QC', 'G1A2B4', 'emilydavis@email.com', 3),
+('Robert', 'Taylor', '1975-06-14', '678-90-1234', 'M678901234', '418-555-1234', '333 Pine St', 'Quebec City', 'QC', 'G1B2C5', 'roberttaylor@email.com', 3),
+
+-- Family Members for Toronto Location
+('Anna', 'Anderson', '1985-02-22', '567-89-0123', 'M567890123', '416-555-2345', '444 Oak Dr', 'Toronto', 'ON', 'M5B3C4', 'annaanderson@email.com', 4),
+('Michael', 'Martinez', '1977-03-18', '890-12-3456', 'M890123456', '416-555-6789', '555 Willow Blvd', 'Toronto', 'ON', 'M5A1B3', 'michaelmartinez@email.com', 4),
+
+-- Family Members for Vancouver Location
+('Sophia', 'Harris', '1988-04-10', '901-23-4567', 'M901234567', '604-555-4567', '666 Fir Ln', 'Vancouver', 'BC', 'V6B2H4', 'sophiaharris@email.com', 6),
+('Daniel', 'Murray', '1981-12-30', '012-34-5678', 'M012345678', '604-555-8901', '777 Spruce St', 'Vancouver', 'BC', 'V6C5E7', 'danielmurray@email.com', 6);
+
+
+
+INSERT INTO ClubMembers (first_name, last_name, date_of_birth, height, weight, ssn, medicare_card, phone_number, address, city, province, postal_code, family_member_id, location_id) VALUES
+-- Club Members for Family Member 1 (Alice Smith)
+('Liam', 'Smith', '2010-08-15', 160.5, 55.2, '111-22-3333', 'M111223333', '514-777-0001', '101 Maple Ave', 'Montreal', 'QC', 'H3C5D6', 1, 1),
+('Olivia', 'Smith', '2008-11-22', 158.2, 50.5, '222-33-4444', 'M222334444', '514-777-0002', '101 Maple Ave', 'Montreal', 'QC', 'H3C5D6', 1, 1),
+
+-- Club Members for Family Member 2 (Tom Johnson)
+('Ethan', 'Johnson', '2012-03-10', 145.0, 48.5, '333-44-5555', 'M333445555', '514-777-0003', '456 Cedar Rd', 'Montreal', 'QC', 'H3A4B7', 2, 1),
+
+-- Club Members for Family Member 3 (Laura Brown)
+('Ava', 'Brown', '2009-07-05', 150.5, 52.0, '444-55-6666', 'M444556666', '450-888-0004', '789 Elm St', 'Laval', 'QC', 'H7B2C3', 3, 2),
+
+-- Club Members for Family Member 4 (Kevin Wilson)
+('Mason', 'Wilson', '2011-10-12', 155.2, 58.3, '555-66-7777', 'M555667777', '450-999-0005', '101 Birch Rd', 'Laval', 'QC', 'H7A1B2', 4, 2),
+
+-- Club Members for Family Member 5 (Emily Davis)
+('Sophia', 'Davis', '2013-04-21', 140.0, 45.2, '666-77-8888', 'M666778888', '418-555-0006', '222 Maple Rd', 'Quebec City', 'QC', 'G1A2B4', 5, 3),
+
+-- Club Members for Family Member 6 (Robert Taylor)
+('Logan', 'Taylor', '2010-06-18', 165.5, 60.5, '777-88-9999', 'M777889999', '418-555-0007', '333 Pine St', 'Quebec City', 'QC', 'G1B2C5', 6, 3),
+
+-- Club Members for Family Member 7 (Anna Anderson)
+('Isabella', 'Anderson', '2009-09-30', 157.0, 52.8, '888-99-1111', 'M888991111', '416-555-0008', '444 Oak Dr', 'Toronto', 'ON', 'M5B3C4', 7, 4),
+('Lucas', 'Anderson', '2011-01-22', 160.3, 56.2, '999-00-2222', 'M999002222', '416-555-0009', '444 Oak Dr', 'Toronto', 'ON', 'M5B3C4', 7, 4),
+
+-- Club Members for Family Member 8 (Michael Martinez)
+('Amelia', 'Martinez', '2012-02-14', 148.7, 50.0, '000-11-3333', 'M000113333', '416-555-0010', '555 Willow Blvd', 'Toronto', 'ON', 'M5A1B3', 8, 4),
+
+-- Club Members for Family Member 9 (Sophia Harris)
+('James', 'Harris', '2013-11-02', 135.0, 42.5, '111-22-4444', 'M111224444', '604-555-0011', '666 Fir Ln', 'Vancouver', 'BC', 'V6B2H4', 9, 6),
+
+-- Club Members for Family Member 10 (Daniel Murray)
+('Charlotte', 'Murray', '2011-05-25', 152.3, 54.5, '222-33-5555', 'M222335555', '604-555-0012', '777 Spruce St', 'Vancouver', 'BC', 'V6C5E7', 10, 6);
+
+select * from ClubMembers;
+
+
+
+INSERT INTO Membership (club_member_id, start_date, end_date) VALUES
+-- Membership for Club Member 1 (Liam Smith) - Active
+(1, '2024-01-01', '2025-01-01'),
+
+-- Membership for Club Member 2 (Olivia Smith) - Active
+(2, '2024-01-01', '2025-01-01'),
+
+-- Membership for Club Member 3 (Ethan Johnson) - Inactive
+(3, '2022-01-01', '2023-01-01'),
+
+-- Membership for Club Member 4 (Ava Brown) - Active
+(4, '2024-02-01', '2025-02-01'),
+
+-- Membership for Club Member 5 (Mason Wilson) - Active
+(5, '2024-03-01', '2025-03-01'),
+
+-- Membership for Club Member 6 (Sophia Davis) - Inactive
+(6, '2021-06-01', '2022-06-01'),
+
+-- Membership for Club Member 7 (Logan Taylor) - Active
+(7, '2024-04-01', '2025-04-01'),
+
+-- Membership for Club Member 8 (Isabella Anderson) - Active
+(8, '2024-05-01', '2025-05-01'),
+
+-- Membership for Club Member 9 (Lucas Anderson) - Inactive
+(9, '2022-07-01', '2023-07-01'),
+
+-- Membership for Club Member 10 (Amelia Martinez) - Active
+(10, '2024-08-01', '2025-08-01'),
+
+-- Membership for Club Member 11 (James Harris) - Inactive
+(11, '2020-09-01', '2021-09-01'),
+
+-- Membership for Club Member 12 (Charlotte Murray) - Active
+(12, '2024-10-01', '2025-10-01');
+
+
+
+
+INSERT INTO Payments (club_member_id, payment_date, amount, payment_method, membership_year) VALUES
+-- Payments for Club Member 1 (Liam Smith)
+(1, '2024-01-15', 100.00, 'Credit Card', 2024),
+
+-- Payments for Club Member 2 (Olivia Smith)
+(2, '2024-01-20', 100.00, 'Debit Card', 2024),
+
+-- Payments for Club Member 3 (Ethan Johnson) - Paid for past membership (Inactive)
+(3, '2022-02-10', 50.00, 'Cash', 2022),
+(3, '2022-06-10', 50.00, 'Cash', 2022),
+
+-- Payments for Club Member 4 (Ava Brown)
+(4, '2024-02-15', 100.00, 'Credit Card', 2024),
+
+-- Payments for Club Member 5 (Mason Wilson) - Paid in installments
+(5, '2024-03-01', 50.00, 'Credit Card', 2024),
+(5, '2024-06-01', 50.00, 'Credit Card', 2024),
+
+-- Payments for Club Member 6 (Sophia Davis) - Past membership (Inactive)
+(6, '2021-07-05', 100.00, 'Debit Card', 2021),
+
+-- Payments for Club Member 7 (Logan Taylor)
+(7, '2024-04-10', 100.00, 'Cash', 2024),
+
+-- Payments for Club Member 8 (Isabella Anderson)
+(8, '2024-05-15', 100.00, 'Credit Card', 2024),
+
+-- Payments for Club Member 9 (Lucas Anderson) - Paid for past membership (Inactive)
+(9, '2022-08-01', 100.00, 'Debit Card', 2022),
+
+-- Payments for Club Member 10 (Amelia Martinez)
+(10, '2024-08-20', 100.00, 'Cash', 2024),
+
+-- Payments for Club Member 11 (James Harris) - Past membership (Inactive)
+(11, '2020-10-10', 100.00, 'Credit Card', 2020),
+
+-- Payments for Club Member 12 (Charlotte Murray)
+(12, '2024-10-25', 100.00, 'Debit Card', 2024);
+
+
+
+INSERT INTO Teams (team_name, location_id) VALUES
+('Montreal Boys U18', 1),
+('Montreal Girls U16', 1),
+('Laval Boys U18', 2),
+('Quebec City Girls U14', 3),
+('Toronto Boys U16', 4);
+
+
+INSERT INTO ClubMember_Teams (club_member_id, team_id) VALUES
+-- Montreal Boys U18
+(1, 1),  -- Liam Smith
+(3, 1),  -- Ethan Johnson
+
+-- Montreal Girls U16
+(2, 2),  -- Olivia Smith
+(4, 2),  -- Ava Brown
+
+-- Laval Boys U18
+(5, 3),  -- Mason Wilson
+
+-- Quebec City Girls U14
+(6, 4),  -- Sophia Davis
+
+-- Toronto Boys U16
+(8, 5),  -- Isabella Anderson
+(9, 5);  -- Lucas Anderson
+
+
+INSERT INTO Personnel_Teams (personnel_id, team_id) VALUES
+-- Montreal Boys U18
+(1, 1),  -- John Doe (General Manager)
+
+-- Montreal Girls U16
+(2, 2),  -- Sarah Johnson (Administrator)
+
+-- Laval Boys U18
+(4, 3),  -- Robert Brown (Coach)
+
+-- Quebec City Girls U14
+(5, 4),  -- Emily Davis (Assistant Coach)
+
+-- Toronto Boys U16
+(7, 5);  -- Jessica Taylor (Coach)
+
+
+
+
+
+
+SELECT * FROM Locations;
+
+-- Display Personnel Table
+SELECT * FROM Personnel;
+
+-- Display FamilyMembers Table
+SELECT * FROM FamilyMembers;
+
+-- Display ClubMembers Table
+SELECT * FROM ClubMembers;
+
+-- Display Membership Table
+SELECT  * FROM Membership;
+
+-- Display Payments Table
+SELECT * FROM Payments;
+
+
