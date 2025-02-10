@@ -1,0 +1,74 @@
+
+SELECT * FROM Locations;
+
+-- Display Personnel Table
+SELECT * FROM Personnel;
+
+-- Display FamilyMembers Table
+SELECT * FROM FamilyMembers;
+
+-- Display ClubMembers Table
+SELECT * FROM ClubMembers;
+
+-- Display Membership Table
+SELECT  * FROM Membership;
+
+-- Display Payments Table
+SELECT * FROM Payments;
+-- i. Get complete details for every location, including personnel and club members count
+SELECT L.*, 
+       P.first_name AS general_manager_first_name, 
+       P.last_name AS general_manager_last_name, 
+       (SELECT COUNT(*) FROM Personnel WHERE location_id = L.location_id) AS personnel_count,
+       (SELECT COUNT(*) FROM ClubMembers WHERE location_id = L.location_id) AS club_member_count
+FROM Locations L
+LEFT JOIN Personnel P ON L.location_id = P.location_id AND P.role = 'General Manager'
+ORDER BY L.province ASC, L.city ASC;
+
+-- ii. Report: Family members with the number of active club members
+SELECT F.first_name, F.last_name, COUNT(C.club_member_id) AS active_club_members
+FROM FamilyMembers F
+LEFT JOIN ClubMembers C ON F.family_member_id = C.family_member_id
+LEFT JOIN Membership M ON C.club_member_id = M.club_member_id
+WHERE CURDATE() BETWEEN M.start_date AND M.end_date
+GROUP BY F.family_member_id
+HAVING COUNT(C.club_member_id) > 0;
+
+-- iii. Personnel operating at a given location
+SELECT first_name, last_name, date_of_birth, ssn, medicare_card, phone_number, 
+       address, city, province, postal_code, email, role, mandate
+FROM Personnel
+WHERE location_id = 10;  -- Change location_id as needed
+
+-- iv. List of all club members sorted by location and age
+SELECT C.*, L.name AS location_name, 
+       TIMESTAMPDIFF(YEAR, C.date_of_birth, CURDATE()) AS age,
+       IF(C.club_member_id IN (SELECT club_member_id FROM Membership WHERE CURDATE() BETWEEN start_date AND end_date), 'Active', 'Inactive') AS status
+FROM ClubMembers C
+JOIN Locations L ON C.location_id = L.location_id
+ORDER BY L.name ASC, age ASC;
+
+-- v. Club members associated with a given family member
+SELECT C.*, 
+       IF(C.club_member_id IN (SELECT club_member_id FROM Membership WHERE CURDATE() BETWEEN start_date AND end_date), 'Active', 'Inactive') AS status
+FROM ClubMembers C
+WHERE C.family_member_id = 7; -- Change as needed
+
+-- vi. Active club members whose family member is also personnel in the same location
+SELECT F.first_name, F.last_name, F.phone_number
+FROM FamilyMembers F
+JOIN ClubMembers C ON F.family_member_id = C.family_member_id
+JOIN Membership M ON C.club_member_id = M.club_member_id
+JOIN Personnel P ON F.ssn = P.ssn AND F.location_id = P.location_id
+WHERE CURDATE() BETWEEN M.start_date AND M.end_date;
+
+-- vii. Payments for a given club member sorted by date
+SELECT payment_date, amount, membership_year
+FROM Payments
+WHERE club_member_id = 1  -- Change as needed
+ORDER BY payment_date ASC;
+
+-- viii. Sum of membership fees paid and total donations collected in 2024
+SELECT 
+    (SELECT SUM(amount) FROM Payments WHERE membership_year = 2024) AS total_membership_fees,
+    (SELECT SUM(amount) FROM Payments WHERE payment_method = 'Donation' AND membership_year = 2024) AS total_donations;
