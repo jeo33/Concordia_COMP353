@@ -3,8 +3,8 @@
     <h1>Locations</h1>
     <ul>
       <li v-for="location in locations" :key="location.LocationID">
-        <strong>{{ location.Name }}</strong> - {{ location.City }}, {{ location.Province }}
-        <button @click="deleteLocation(location.LocationID)">Delete</button>
+        <strong>{{ location.name }}</strong> - {{ location.city }}, {{ location.province }}
+        <button @click="deleteLocation(location.location_id)">Delete</button>
       </li>
     </ul>
 
@@ -12,19 +12,19 @@
     <form @submit.prevent="addLocation">
       <label>
         Name:
-        <input type="text" v-model="newLocation.Name" />
+        <input type="text" v-model="newLocation.name" />
       </label>
       <label>
         City:
-        <input type="text" v-model="newLocation.City" />
+        <input type="text" v-model="newLocation.city" />
       </label>
       <label>
         Province:
-        <input type="text" v-model="newLocation.Province" />
+        <input type="text" v-model="newLocation.province" />
       </label>
       <label>
         Max Capacity:
-        <input type="number" v-model="newLocation.MaxCapacity" />
+        <input type="number" v-model="newLocation.max_capacity" />
       </label>
       <button type="submit">Add</button>
     </form>
@@ -49,6 +49,7 @@ export default {
         const response = await fetch("http://127.0.0.1:5000/locations");
         const data = await response.json();
         locations.value = data;
+        console.log(data);
       } catch (error) {
         console.error("Failed to fetch locations", error);
       }

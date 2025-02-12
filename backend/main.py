@@ -9,7 +9,7 @@ CORS(app)  # Enable CORS for all routes
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "n3u8c5t9A!",
+    "password": "1234",
     "database": "mydb"
 }
 
