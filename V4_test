@@ -423,7 +423,7 @@ JOIN CommonInfo ci ON fm.CommonID = ci.CommonID
 JOIN ClubMembers cm ON fm.FamilyMemberID = cm.FamilyMemberID
 JOIN Memberships m ON cm.MemberID = m.MemberID
 JOIN Locations l ON fm.LocationID = l.LocationID
-WHERE l.LocationID = 1 -- Replace with your desired location ID
+WHERE l.LocationID = 1 
   AND m.Status = 'Active'
 GROUP BY fm.FamilyMemberID;
 
@@ -447,7 +447,7 @@ FROM Personnel p
 JOIN CommonInfo ci ON p.CommonID = ci.CommonID
 JOIN Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
 JOIN Locations l ON pa.LocationID = l.LocationID
-WHERE l.LocationID = 1; -- Replace with your desired location ID
+WHERE l.LocationID = 1; 
 
 
 -- iv. Get a detailed list of all club members registered in the system
@@ -506,7 +506,7 @@ JOIN Locations l ON fm.LocationID = l.LocationID
 WHERE m.Status = 'Active'
 AND p.LocationID = fm.LocationID
 AND p.Role IN ('General Manager', 'Deputy Manager', 'Treasurer', 'Secretary', 'Coach', 'Assistant Coach', 'Captain')  -- Operator roles
-AND fm.LocationID = 1  -- Filter by the given location
+AND fm.LocationID = 1  
 ORDER BY ci.FirstName, ci.LastName;
 
 
