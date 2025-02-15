@@ -1,0 +1,599 @@
+SELECT * FROM Period;
+SELECT * FROM Locations;
+SELECT * FROM CommonInfo;
+SELECT * FROM Personnel;
+SELECT * FROM Personnel_Assignments;
+SELECT * FROM FamilyMembers;
+SELECT * FROM ClubMembers;
+SELECT * FROM Memberships;
+SELECT * FROM Teams;
+SELECT * FROM ClubMembers_Teams;
+SELECT * FROM Payments;
+
+
+-- Insert Locations into the Locations table
+INSERT INTO Locations (Type, Name, Address, City, Province, PostalCode, PhoneNumber, MaxCapacity)
+VALUES
+  ('Head', 'Montreal Downtown', '123 Montreal Downtown St.', 'Montreal', 'QC', 'Q1X 806', '514-555-5079', 98),
+  ('Branch', 'Plateau Mont-Royal', '123 Plateau Mont-Royal St.', 'Montreal', 'QC', 'Q3T 611', '514-555-8635', 118),
+  ('Branch', 'Outremont', '123 Outremont St.', 'Montreal', 'QC', 'Q4C 725', '514-555-7097', 85),
+  ('Branch', 'Villeray', '123 Villeray St.', 'Montreal', 'QC', 'Q1D 911', '514-555-7800', 151),
+  ('Branch', 'Verdun', '123 Verdun St.', 'Montreal', 'QC', 'Q6W 197', '514-555-6117', 192),
+  ('Branch', 'Ahuntsic-Cartierville', '123 Ahuntsic-Cartierville St.', 'Montreal', 'QC', 'Q6F 530', '514-555-2408', 150),
+  ('Branch', 'Rosemont', '123 Rosemont St.', 'Montreal', 'QC', 'Q7C 738', '514-555-6681', 160),
+  ('Branch', 'Hochelaga-Maisonneuve', '123 Hochelaga-Maisonneuve St.', 'Montreal', 'QC', 'Q5O 169', '514-555-2704', 54),
+  ('Branch', 'Côte-des-Neiges', '123 Côte-des-Neiges St.', 'Montreal', 'QC', 'Q4F 533', '514-555-7724', 86),
+  ('Branch', 'Saint-Laurent', '123 Saint-Laurent St.', 'Montreal', 'QC', 'Q4I 409', '514-555-4867', 120);
+
+
+INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber, Email, Address, City, Province, PostalCode)
+VALUES
+  ('John', 'Doe', '1985-04-23', '000000001', 'MCN000001', '514-555-0101', 'john.doe@example.com', '123 Elm St.', 'Montreal', 'QC', 'H3A 1B2'),
+  ('Jane', 'Smith', '1992-06-10', '000000002', 'MCN000002', '514-555-0102', 'jane.smith@example.com', '456 Maple St.', 'Montreal', 'QC', 'H2X 2Y3'),
+  ('Emily', 'Johnson', '1990-02-15', '000000003', 'MCN000003', '514-555-0103', 'emily.jhnson@example.com', '789 Oak St.', 'Montreal', 'QC', 'H4A 3C4'),
+  ('Michael', 'Williams', '1987-11-30', '000000004', 'MCN000004', '514-555-0104', 'michael.williams@example.com', '101 Pine St.', 'Montreal', 'QC', 'H5B 4D5'),
+  ('Sarah', 'Brown', '1988-07-22', '000000005', 'MCN000005', '514-555-0105', 'sarah.brown@example.com', '202 Cedar St.', 'Montreal', 'QC', 'H6C 5E6'),
+  ('James', 'Davis', '1984-01-10', '000000006', 'MCN000006', '514-555-0106', 'james.davis@example.com', '303 Birch St.', 'Montreal', 'QC', 'H7D 6F7'),
+  ('Olivia', 'Martinez', '1995-09-18', '000000007', 'MCN000007', '514-555-0107', 'olivia.martinez@example.com', '404 Ash St.', 'Montreal', 'QC', 'H8E 7G8'),
+  ('David', 'Garcia', '1989-03-07', '000000008', 'MCN000008', '514-555-0108', 'david.garcia@example.com', '505 Fir St.', 'Montreal', 'QC', 'H9F 8H9'),
+  ('Sophia', 'Rodriguez', '1991-05-25', '000000009', 'MCN000009', '514-555-0109', 'sophia.rodriguez@example.com', '606 Willow St.', 'Montreal', 'QC', 'H0G 9I0'),
+  ('Daniel', 'Martinez', '1983-12-12', '000000010', 'MCN000010', '514-555-0110', 'daniel.martinez@example.com', '707 Redwood St.', 'Montreal', 'QC', 'H1J 0K1'),
+  ('Liam', 'Lopez', '1993-08-30', '000000011', 'MCN000011', '514-555-0111', 'liam.lopez@example.com', '808 Maple St.', 'Montreal', 'QC', 'H2K 1L2'),
+  ('Ava', 'Miller', '1996-11-14', '000000012', 'MCN000012', '514-555-0112', 'ava.miller@example.com', '909 Elm St.', 'Montreal', 'QC', 'H3L 2M3'),
+  ('Mason', 'Wilson', '1981-03-21', '000000013', 'MCN000013', '514-555-0113', 'mason.wilson@example.com', '101 Birch St.', 'Montreal', 'QC', 'H4M 3N4'),
+  ('Isabella', 'Taylor', '1998-05-07', '000000014', 'MCN000014', '514-555-0114', 'isabella.taylor@example.com', '202 Cedar St.', 'Montreal', 'QC', 'H5O 4P5'),
+  ('Ethan', 'Anderson', '1990-09-01', '000000015', 'MCN000015', '514-555-0115', 'ethan.anderson@example.com', '303 Ash St.', 'Montreal', 'QC', 'H6Q 5R6'),
+  ('Charlotte', 'Thomas', '1985-12-23', '000000016', 'MCN000016', '514-555-0116', 'charlotte.thomas@example.com', '404 Redwood St.', 'Montreal', 'QC', 'H7S 6T7'),
+  ('Benjamin', 'Jackson', '1992-02-17', '000000017', 'MCN000017', '514-555-0117', 'benjamin.jackson@example.com', '505 Pine St.', 'Montreal', 'QC', 'H8U 7V8'),
+  ('Amelia', 'White', '1989-08-11', '000000018', 'MCN000018', '514-555-0118', 'amelia.white@example.com', '606 Fir St.', 'Montreal', 'QC', 'H9W 8X9'),
+  ('Lucas', 'Harris', '1994-07-13', '000000019', 'MCN000019', '514-555-0119', 'lucas.harris@example.com', '707 Oak St.', 'Montreal', 'QC', 'H0Y 9Z0'),
+  ('Harper', 'Clark', '1991-10-29', '000000020', 'MCN000020', '514-555-0120', 'harper.clark@example.com', '808 Maple St.', 'Montreal', 'QC', 'H1A 0B1'),
+  ('Jackson', 'Lewis', '1996-03-04', '000000021', 'MCN000021', '514-555-0121', 'jackson.lewis@example.com', '909 Birch St.', 'Montreal', 'QC', 'H2B 1C2'),
+  ('Ella', 'Young', '1997-06-17', '000000022', 'MCN000022', '514-555-0122', 'ella.young@example.com', '101 Cedar St.', 'Montreal', 'QC', 'H3C 2D3'),
+  ('Logan', 'Allen', '1994-12-01', '000000023', 'MCN000023', '514-555-0123', 'logan.allen@example.com', '202 Ash St.', 'Montreal', 'QC', 'H4D 3E4'),
+  ('Mia', 'King', '1992-11-09', '000000024', 'MCN000024', '514-555-0124', 'mia.king@example.com', '303 Oak St.', 'Montreal', 'QC', 'H5E 4F5'),
+  ('Sebastian', 'Scott', '1990-04-18', '000000025', 'MCN000025', '514-555-0125', 'sebastian.scott@example.com', '404 Maple St.', 'Montreal', 'QC', 'H6F 5G6'),
+  ('Zoe', 'Adams', '1988-02-22', '000000026', 'MCN000026', '514-555-0126', 'zoe.adams@example.com', '505 Birch St.', 'Montreal', 'QC', 'H7G 6H7'),
+  ('Elijah', 'Nelson', '1985-09-13', '000000027', 'MCN000027', '514-555-0127', 'elijah.nelson@example.com', '606 Pine St.', 'Montreal', 'QC', 'H8I 7J7'),
+  ('Lily', 'Carter', '1993-12-08', '000000028', 'MCN000028', '514-555-0128', 'lily.carter@example.com', '707 Fir St.', 'Montreal', 'QC', 'H9J 8K8'),
+  ('Jacob', 'Mitchell', '1986-05-14', '000000029', 'MCN000029', '514-555-0129', 'jacob.mitchell@example.com', '808 Redwood St.', 'Montreal', 'QC', 'H0K 9L9'),
+  ('Madison', 'Perez', '1990-07-27', '000000030', 'MCN000030', '514-555-0130', 'madison.perez@example.com', '909 Fir St.', 'Montreal', 'QC', 'H1L 0M0'),
+  ('William', 'Roberts', '1992-10-03', '000000031', 'MCN000031', '514-555-0131', 'william.roberts@example.com', '101 Redwood St.', 'Montreal', 'QC', 'H2M 1N1'),
+  ('Chloe', 'Hernandez', '1989-12-19', '000000032', 'MCN000032', '514-555-0132', 'chloe.hernandez@example.com', '202 Pine St.', 'Montreal', 'QC', 'H3N 2O2'),
+  ('Henry', 'Baker', '1995-05-02', '000000033', 'MCN000033', '514-555-0133', 'henry.baker@example.com', '303 Redwood St.', 'Montreal', 'QC', 'H4O 3P3'),
+  ('Scarlett', 'Gonzalez', '1987-04-11', '000000034', 'MCN000034', '514-555-0134', 'scarlett.gonzalez@example.com', '404 Ash St.', 'Montreal', 'QC', 'H5P 4Q4'),
+  ('Jack', 'Murphy', '1994-09-17', '000000035', 'MCN000035', '514-555-0135', 'jack.murphy@example.com', '505 Cedar St.', 'Montreal', 'QC', 'H6Q 5R5'),
+  ('Grace', 'Rivera', '1991-03-14', '000000036', 'MCN000036', '514-555-0136', 'grace.rivera@example.com', '606 Oak St.', 'Montreal', 'QC', 'H7R 6S6'),
+  ('Wyatt', 'Cooper', '1983-06-29', '000000037', 'MCN000037', '514-555-0137', 'wyatt.cooper@example.com', '707 Birch St.', 'Montreal', 'QC', 'H8S 7T7');
+INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber, Email, Address, City, Province, PostalCode)
+VALUES
+  ('Samuel', 'Reed', '1990-01-21', '000000041', 'MCN000041', '514-555-0138', 'samuel.reed@example.com', '808 Birch St.', 'Montreal', 'QC', 'H1A 1A1'),
+  ('Avery', 'King', '1986-04-09', '000000042', 'MCN000042', '514-555-0139', 'avery.king@example.com', '909 Cedar St.', 'Montreal', 'QC', 'H2A 2B2'),
+  ('Lucas', 'Martinez', '1993-07-15', '000000043', 'MCN000043', '514-555-0140', 'lucas.martinez@example.com', '101 Oak St.', 'Montreal', 'QC', 'H3A 3C3'),
+  ('Mason', 'Harris', '1988-11-22', '000000044', 'MCN000044', '514-555-0141', 'mason.harris@example.com', '202 Ash St.', 'Montreal', 'QC', 'H4B 4D4'),
+  ('Ella', 'Young', '1994-06-08', '000000045', 'MCN000045', '514-555-0142', 'ella.young@example.com', '303 Redwood St.', 'Montreal', 'QC', 'H5C 5E5'),
+  ('Grace', 'Hall', '1995-01-18', '000000046', 'MCN000046', '514-555-0143', 'grace.hall@example.com', '404 Pine St.', 'Montreal', 'QC', 'H6D 6F6'),
+  ('Ryan', 'Allen', '1989-05-11', '000000047', 'MCN000047', '514-555-0144', 'ryan.allen@example.com', '505 Oak St.', 'Montreal', 'QC', 'H7E 7G7'),
+  ('Natalie', 'Thomas', '1996-02-28', '000000048', 'MCN000048', '514-555-0145', 'natalie.thomas@example.com', '606 Birch St.', 'Montreal', 'QC', 'H8F 8H8'),
+  ('Tyler', 'White', '1990-12-03', '000000049', 'MCN000049', '514-555-0146', 'tyler.white@example.com', '707 Redwood St.', 'Montreal', 'QC', 'H9G 9I9'),
+  ('Chloe', 'Lopez', '1992-10-24', '000000050', 'MCN000050', '514-555-0147', 'chloe.lopez@example.com', '808 Pine St.', 'Montreal', 'QC', 'H0H 1J1'),
+  ('Alexander', 'Clark', '1987-09-13', '000000051', 'MCN000051', '514-555-0148', 'alexander.clark@example.com', '909 Ash St.', 'Montreal', 'QC', 'H1J 2K2'),
+  ('Lily', 'Allen', '1995-03-20', '000000052', 'MCN000052', '514-555-0149', 'lily.allen@example.com', '101 Redwood St.', 'Montreal', 'QC', 'H2K 3L3'),
+  ('Jack', 'Lopez', '1994-08-09', '000000053', 'MCN000053', '514-555-0150', 'jack.lopez@example.com', '202 Oak St.', 'Montreal', 'QC', 'H3L 4M4'),
+  ('Mia', 'Miller', '1989-01-22', '000000054', 'MCN000054', '514-555-0151', 'mia.miller@example.com', '303 Cedar St.', 'Montreal', 'QC', 'H4N 5O5'),
+  ('Sophie', 'Roberts', '1992-07-15', '000000055', 'MCN000055', '514-555-0152', 'sophie.roberts@example.com', '404 Redwood St.', 'Montreal', 'QC', 'H5P 6Q6'),
+  ('Owen', 'Morris', '1987-06-29', '000000056', 'MCN000056', '514-555-0153', 'owen.morris@example.com', '505 Pine St.', 'Montreal', 'QC', 'H6Q 7R7'),
+  ('Amelia', 'Jackson', '1993-11-30', '000000057', 'MCN000057', '514-555-0154', 'amelia.jackson@example.com', '606 Cedar St.', 'Montreal', 'QC', 'H7R 8S8'),
+  ('James', 'Wilson', '1990-04-18', '000000058', 'MCN000058', '514-555-0155', 'james.wilson@example.com', '707 Oak St.', 'Montreal', 'QC', 'H8S 9T9'),
+  ('Zoe', 'Lee', '1985-08-17', '000000059', 'MCN000059', '514-555-0156', 'zoe.lee@example.com', '808 Cedar St.', 'Montreal', 'QC', 'H9T 0U0'),
+  ('Ethan', 'King', '1991-02-26', '000000060', 'MCN000060', '514-555-0157', 'ethan.king@example.com', '909 Pine St.', 'Montreal', 'QC', 'H0U 1V1');
+
+INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber, Email, Address, City, Province, PostalCode) VALUES
+('John', 'Doe', '1990-05-12', '123456789', 'A123456789', '514-123-4567', 'john.doe@example.com', '123 Maple St', 'Montreal', 'QC', 'H1A 2B3'),
+('Jane', 'Smith', '1985-07-22', '234567890', 'B987654321', '438-456-7890', 'jane.smith@example.com', '456 Pine St', 'Laval', 'QC', 'H2C 3D4'),
+('Alice', 'Johnson', '1998-03-15', '345678901', 'C567890123', '514-678-1234', 'alice.johnson@example.com', '789 Oak St', 'Montreal', 'QC', 'H3E 4F5'),
+('Bob', 'Williams', '1972-11-02', '456789012', 'D456789012', '450-789-4561', 'bob.williams@example.com', '101 Birch St', 'Longueuil', 'QC', 'J4G 5H6'),
+('Charlie', 'Brown', '1995-06-30', '567890123', 'E345678901', '514-890-5678', 'charlie.brown@example.com', '202 Elm St', 'Montreal', 'QC', 'H5I 6J7'),
+('David', 'Taylor', '2000-12-20', '678901234', 'F234567890', '514-901-6789', 'david.taylor@example.com', '303 Cedar St', 'Brossard', 'QC', 'J5K 7L8'),
+('Eve', 'Anderson', '1992-04-10', '789012345', 'G123456789', '438-012-3456', 'eve.anderson@example.com', '404 Spruce St', 'Montreal', 'QC', 'H6L 8M9'),
+('Frank', 'Thomas', '1988-09-15', '890123456', 'H098765432', '514-123-6789', 'frank.thomas@example.com', '505 Willow St', 'Laval', 'QC', 'H7N 9P0'),
+('Grace', 'Harris', '1978-01-25', '901234567', 'I876543210', '514-234-7890', 'grace.harris@example.com', '606 Chestnut St', 'Montreal', 'QC', 'H8O 1P1'),
+('Henry', 'Martin', '1983-05-05', '123345678', 'J765432109', '514-345-8901', 'henry.martin@example.com', '707 Redwood St', 'Longueuil', 'QC', 'J9P 2Q3'),
+('Isabel', 'Clark', '1996-07-14', '234456789', 'K654321098', '514-456-9012', 'isabel.clark@example.com', '808 Poplar St', 'Montreal', 'QC', 'H0R 3S4'),
+('Jack', 'Lee', '1981-08-24', '345567890', 'L543210987', '450-567-0123', 'jack.lee@example.com', '909 Ash St', 'Brossard', 'QC', 'J1T 4U5'),
+('Kelly', 'Adams', '1975-02-28', '456678901', 'M432109876', '514-678-1234', 'kelly.adams@example.com', '1010 Fir St', 'Laval', 'QC', 'H2V 5W6'),
+('Liam', 'Moore', '1999-10-10', '567789012', 'N321098765', '438-789-4567', 'liam.moore@example.com', '1111 Aspen St', 'Montreal', 'QC', 'H3X 6Y7'),
+('Mia', 'Walker', '1989-12-31', '678890123', 'O210987654', '514-890-5678', 'mia.walker@example.com', '1212 Hemlock St', 'Longueuil', 'QC', 'J4Y 7Z8'),
+('Nathan', 'Hall', '1977-03-13', '789901234', 'P109876543', '450-901-6789', 'nathan.hall@example.com', '1313 Alder St', 'Montreal', 'QC', 'H5Z 8A9'),
+('Olivia', 'Scott', '2001-11-11', '890012345', 'Q987654321', '514-012-3456', 'olivia.scott@example.com', '1414 Maple St', 'Laval', 'QC', 'H7B 1C0'),
+('Paul', 'Evans', '1986-06-06', '901123456', 'R876543210', '514-123-4567', 'paul.evans@example.com', '1515 Birch St', 'Montreal', 'QC', 'H8C 2D1'),
+('Quinn', 'Hill', '1991-09-09', '123234567', 'S765432109', '438-234-5678', 'quinn.hill@example.com', '1616 Pine St', 'Longueuil', 'QC', 'J9E 3F2'),
+('Ruby', 'Green', '1982-02-02', '234345678', 'T654321098', '514-345-6789', 'ruby.green@example.com', '1717 Oak St', 'Montreal', 'QC', 'H0G 4H3');
+
+INSERT INTO Period ( StartDate, EndDate)
+VALUES
+('2025-01-01', NULL);
+INSERT INTO Personnel (CommonID, Role, Mandate)
+VALUES
+  (1, 'General Manager', 'Salaried'),
+  (2, 'Administrator', 'Salaried'),
+  (3, 'Coach', 'Salaried'),
+  (4, 'Assistant Coach', 'Volunteer'),
+  (5, 'Administrator', 'Salaried'),
+  (6, 'Coach', 'Salaried'),
+  (7, 'Assistant Coach', 'Volunteer'),
+  (8, 'Coach', 'Salaried'),
+  (9, 'Administrator', 'Salaried'),
+  (10, 'Assistant Coach', 'Volunteer'),
+  (11, 'Administrator', 'Salaried'),
+  (12, 'Coach', 'Volunteer'),
+  (13, 'Administrator', 'Salaried'),
+  (14, 'Coach', 'Salaried'),
+  (15, 'Assistant Coach', 'Volunteer'),
+  (16, 'Administrator', 'Salaried'),
+  (17, 'Coach', 'Salaried'),
+  (18, 'Assistant Coach', 'Volunteer'),
+  (19, 'Administrator', 'Salaried'),
+  (20, 'Coach', 'Salaried');
+
+INSERT INTO Personnel_Assignments (PersonnelID, LocationID, PeriodID)
+VALUES
+  (1, 1, 1),
+  (2, 1, 1),
+  (3, 2, 1),
+  (4, 2, 1),
+  (5, 3, 1),
+  (6, 3, 1),
+  (7, 4, 1),
+  (8, 4, 1),
+  (9, 5, 1),
+  (10, 5, 1),
+  (11, 6, 1),
+  (12, 6, 1),
+  (13, 7, 1),
+  (14, 7, 1),
+  (15, 8, 1),
+  (16, 8, 1),
+  (17, 9, 1),
+  (18, 9, 1),
+  (19, 10, 1),
+  (20, 10, 1);
+
+
+INSERT INTO FamilyMembers (CommonID, LocationID, Relationship)
+VALUES
+  (1, 1, 'Tutor'),
+  (21, 1, 'Father'),
+  (22, 1, 'Mother'),
+
+  (3, 2, 'Tutor'),
+  (23, 2, 'Father'),
+  (24, 2, 'Mother'),
+
+  (5, 3, 'Tutor'),
+  (25, 3, 'Father'),
+  (26, 3, 'Mother'),
+
+  (7, 4, 'Tutor'),
+  (27, 4, 'Father'),
+  (28, 4, 'Mother'),
+
+  (9, 5, 'Tutor'),
+  (29, 5, 'Father'),
+  (30, 5, 'Mother'),
+
+  (11, 6, 'Tutor'),
+  (31, 6, 'Father'),
+  (32, 6, 'Mother'),
+
+  (13, 7, 'Tutor'),
+  (33, 7, 'Father'),
+  (34, 7, 'Mother'),
+
+  (15, 8, 'Tutor'),
+  (35, 8, 'Father'),
+  (36, 8, 'Mother'),
+
+  (17, 9, 'Tutor'),
+  (37, 9, 'Father'),
+  (38, 9, 'Mother'),
+
+  (19, 10, 'Tutor'),
+  (39, 10, 'Father'),
+  (40, 10, 'Mother');
+
+
+
+INSERT INTO ClubMembers (CommonID, FamilyMemberID, LocationID, Height, Weight)
+VALUES
+  -- Family 1
+  (41, 2, 1, 165.50, 60.00),
+  (42, 3, 1, 172.30, 75.00),
+  (43, 1, 1, 180.00, 70.00),
+
+  -- Family 2
+  (44, 5, 2, 160.00, 55.00),
+  (45, 6, 2, 170.25, 68.00),
+  (46, 4, 2, 182.10, 72.00),
+
+  -- Family 3
+  (47, 8, 3, 158.70, 50.00),
+  (48, 9, 3, 175.00, 78.00),
+  (49, 7, 3, 185.40, 82.00),
+
+  -- Family 4
+  (50, 11, 4, 162.00, 52.00),
+  (51, 12, 4, 168.20, 65.00),
+  (52, 10, 4, 183.30, 75.00),
+
+  -- Family 5
+  (53, 14, 5, 159.00, 48.00),
+  (54, 15, 5, 173.50, 70.00),
+  (55, 13, 5, 181.20, 76.00),
+
+  -- Family 6
+  (56, 17, 6, 163.30, 57.00),
+  (57, 18, 6, 169.80, 62.00),
+  (58, 16, 6, 179.50, 68.00),
+
+  -- Family 7
+  (59, 20, 7, 155.40, 49.00),
+  (60, 21, 7, 176.20, 80.00),
+  (61, 19, 7, 184.00, 85.00),
+
+  -- Family 8
+  (62, 23, 8, 161.00, 58.00),
+  (63, 24, 8, 177.70, 72.00),
+  (64, 22, 8, 182.50, 78.00),
+
+  -- Family 9
+  (65, 26, 9, 164.80, 55.00),
+  (66, 27, 9, 170.00, 65.00),
+  (67, 25, 9, 180.90, 70.00),
+
+  -- Family 10
+  (68, 29, 10, 166.10, 60.00),
+  (69, 30, 10, 174.20, 68.00),
+  (70, 28, 10, 181.90, 73.00);
+
+
+
+INSERT INTO Teams (TeamName, TeamType, LocationID)
+VALUES
+  ('Location1 Boys Team', 'Boys', 1),
+  ('Location1 Girls Team', 'Girls', 1),
+
+  ('Location2 Boys Team', 'Boys', 2),
+  ('Location2 Girls Team', 'Girls', 2),
+
+  ('Location3 Boys Team', 'Boys', 3),
+  ('Location3 Girls Team', 'Girls', 3),
+
+  ('Location4 Boys Team', 'Boys', 4),
+  ('Location4 Girls Team', 'Girls', 4),
+
+  ('Location5 Boys Team', 'Boys', 5),
+  ('Location5 Girls Team', 'Girls', 5),
+
+  ('Location6 Boys Team', 'Boys', 6),
+  ('Location6 Girls Team', 'Girls', 6),
+
+  ('Location7 Boys Team', 'Boys', 7),
+  ('Location7 Girls Team', 'Girls', 7),
+
+  ('Location8 Boys Team', 'Boys', 8),
+  ('Location8 Girls Team', 'Girls', 8),
+
+  ('Location9 Boys Team', 'Boys', 9),
+  ('Location9 Girls Team', 'Girls', 9),
+
+  ('Location10 Boys Team', 'Boys', 10),
+  ('Location10 Girls Team', 'Girls', 10);
+
+
+INSERT INTO Memberships (MemberID, Year, Status, TotalPaid)
+VALUES
+  (1, 2025, 'Active', 120),
+  (2, 2025, 'Active', 80),
+  (3, 2025, 'Inactive', 50),
+  (4, 2025, 'Active', 150),
+  (5, 2025, 'Active', 200),
+  (6, 2025, 'Inactive', 90),
+  (7, 2025, 'Active', 110),
+  (8, 2025, 'Active', 95),
+  (9, 2025, 'Active', 160),
+  (10, 2025, 'Inactive', 75),
+
+  (11, 2025, 'Active', 180),
+  (12, 2025, 'Active', 130),
+  (13, 2025, 'Inactive', 40),
+  (14, 2025, 'Active', 200),
+  (15, 2025, 'Active', 210),
+  (16, 2025, 'Inactive', 60),
+  (17, 2025, 'Active', 120),
+  (18, 2025, 'Active', 115),
+  (19, 2025, 'Active', 155),
+  (20, 2025, 'Inactive', 85),
+
+  (21, 2025, 'Active', 140),
+  (22, 2025, 'Active', 125),
+  (23, 2025, 'Inactive', 65),
+  (24, 2025, 'Active', 170),
+  (25, 2025, 'Active', 220),
+  (26, 2025, 'Inactive', 50),
+  (27, 2025, 'Active', 110),
+  (28, 2025, 'Active', 140),
+  (29, 2025, 'Active', 130),
+  (30, 2025, 'Inactive', 70);
+  
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE Memberships
+SET TotalPaid = 100
+WHERE Status = 'Active' AND TotalPaid < 100;
+
+SET SQL_SAFE_UPDATES = 1;
+
+
+
+-- Insert sample data into ClubMembers_Teams for 10 locations following the specified pattern
+INSERT INTO ClubMembers_Teams (TeamID, MemberID, LocationID)
+VALUES
+(1, 1, 1),
+(2, 2, 1),
+(2, 3, 1),
+
+(3, 4, 2),
+(4, 5, 2),
+(4, 6, 2),
+
+(5, 7, 3),
+(6, 8, 3),
+(6, 9, 3),
+
+(7, 10, 4),
+(8, 11, 4),
+(8, 12, 4),
+
+(9, 13, 5),
+(10, 14, 5),
+(10, 15, 5),
+
+(11, 16, 6),
+(12, 17, 6),
+(12, 18, 6),
+
+(13, 19, 7),
+(14, 20, 7),
+(14, 21, 7),
+
+(15, 22, 8),
+(16, 23, 8),
+(16, 24, 8),
+
+(17, 25, 9),
+(18, 26, 9),
+(18, 27, 9),
+
+(19, 28, 10),
+(20, 29, 10),
+(20, 30, 10);
+
+INSERT INTO Payments (MembershipID, PaymentDate, Amount, PaymentMethod)
+SELECT
+    MembershipID,
+    CURRENT_DATE,  -- or a specific date for the payment
+    TotalPaid,
+    'Credit'  -- Assuming the payment method is 'Credit Card'; adjust as needed
+FROM Memberships;
+
+SET SQL_SAFE_UPDATES = 0;
+update Payments
+set Amount=Amount/2;
+
+SET SQL_SAFE_UPDATES = 1;
+
+
+
+
+-- i. Get complete details for every location
+SELECT 
+    l.Name AS LocationName,
+    l.Address,
+    l.City,
+    l.Province,
+    l.PostalCode,
+    l.PhoneNumber,
+    l.WebAddress,
+    l.Type AS LocationType,
+    l.MaxCapacity,
+    (SELECT FirstName FROM Personnel p JOIN CommonInfo c ON p.CommonID = c.CommonID WHERE p.Role = 'General Manager' AND p.LocationID = l.LocationID LIMIT 1) AS GeneralManagerName,
+    (SELECT COUNT(*) FROM Personnel p WHERE p.LocationID = l.LocationID) AS PersonnelCount,
+    (SELECT COUNT(*) FROM ClubMembers cm WHERE cm.LocationID = l.LocationID) AS ClubMembersCount
+FROM Locations l
+ORDER BY l.Province, l.City;
+
+-- ii. For a given location, provide a report about family members with active club members
+SELECT 
+    ci.FirstName AS FamilyMemberFirstName,
+    ci.LastName AS FamilyMemberLastName,
+    COUNT(cm.MemberID) AS ActiveClubMembersCount
+FROM FamilyMembers fm
+JOIN CommonInfo ci ON fm.CommonID = ci.CommonID
+JOIN ClubMembers cm ON fm.FamilyMemberID = cm.FamilyMemberID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+JOIN Locations l ON fm.LocationID = l.LocationID
+WHERE l.LocationID = 1 -- Replace with your desired location ID
+  AND m.Status = 'Active'
+GROUP BY fm.FamilyMemberID;
+
+
+-- iii. For a given location, report on personnel
+SELECT 
+    ci.FirstName,
+    ci.LastName,
+    ci.DateOfBirth,
+    ci.SSN,
+    ci.MedicareCardNumber,
+    ci.PhoneNumber,
+    ci.Address,
+    ci.City,
+    ci.Province,
+    ci.PostalCode,
+    ci.Email,
+    p.Role,
+    p.Mandate
+FROM Personnel p
+JOIN CommonInfo ci ON p.CommonID = ci.CommonID
+JOIN Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
+JOIN Locations l ON pa.LocationID = l.LocationID
+WHERE l.LocationID = 1; -- Replace with your desired location ID
+
+
+-- iv. Get a detailed list of all club members registered in the system
+SELECT 
+    l.Name AS LocationName,
+    cm.MemberID AS MembershipNumber,
+    ci.FirstName,
+    ci.LastName,
+    TIMESTAMPDIFF(YEAR, ci.DateOfBirth, CURDATE()) AS Age,
+    ci.City,
+    ci.Province,
+    m.Status
+FROM ClubMembers cm
+JOIN CommonInfo ci ON cm.CommonID = ci.CommonID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+JOIN Locations l ON cm.LocationID = l.LocationID
+WHERE m.Status IN ('Active', 'Inactive')
+ORDER BY l.Name ASC, Age ASC;
+
+
+-- v. For a given family member, get details of all club members associated with him/her
+SELECT 
+    m.MembershipID AS ClubMembershipNumber,
+    ci.FirstName,
+    ci.LastName,
+    ci.DateOfBirth,
+    ci.SSN,
+    ci.MedicareCardNumber,
+    ci.PhoneNumber,
+    ci.Address,
+    ci.City,
+    ci.Province,
+    ci.PostalCode,
+    fm.Relationship,
+    m.Status
+FROM ClubMembers cm
+JOIN CommonInfo ci ON cm.CommonID = ci.CommonID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+JOIN FamilyMembers fm ON cm.FamilyMemberID = fm.FamilyMemberID
+WHERE fm.FamilyMemberID = 1
+ORDER BY m.MembershipID;
+
+
+-- vi. For a given location, get family members with active club members associated and operator personnel
+SELECT 
+    ci.FirstName AS FamilyMemberFirstName,
+    ci.LastName AS FamilyMemberLastName,
+    ci.PhoneNumber AS FamilyMemberPhoneNumber
+FROM FamilyMembers fm
+JOIN CommonInfo ci ON fm.CommonID = ci.CommonID
+JOIN ClubMembers cm ON fm.FamilyMemberID = cm.FamilyMemberID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+JOIN Personnel_Assignments pa ON pa.LocationID = fm.LocationID
+JOIN Personnel p ON p.PersonnelID = pa.PersonnelID
+JOIN Locations l ON fm.LocationID = l.LocationID
+WHERE m.Status = 'Active'
+AND p.LocationID = fm.LocationID
+AND p.Role IN ('General Manager', 'Deputy Manager', 'Treasurer', 'Secretary', 'Coach', 'Assistant Coach', 'Captain')  -- Operator roles
+AND fm.LocationID = 1  -- Filter by the given location
+ORDER BY ci.FirstName, ci.LastName;
+
+
+
+
+
+
+-- vii. For a given club member, give details of all payments for membership fees
+SELECT 
+    p.PaymentDate,
+    p.Amount,
+    YEAR(p.PaymentDate) AS YearPaid
+FROM Payments p
+JOIN Memberships m ON p.MembershipID = m.MembershipID
+WHERE m.MemberID = 1
+ORDER BY p.PaymentDate;
+
+-- viii. Get the sum of membership fees paid and donations collected by the club in 2024
+SELECT 
+    SUM(p.Amount) AS TotalMembershipFeesPaid,
+    SUM(m.DonationAmount) AS TotalDonationsCollected
+FROM Payments p
+JOIN Memberships m ON p.MembershipID = m.MembershipID
+WHERE YEAR(p.PaymentDate) = 2025;
+
+
+
+
+
+
+
+
+
+SELECT * FROM Period;
+SELECT * FROM Locations;
+SELECT * FROM CommonInfo;
+SELECT * FROM Personnel;
+SELECT * FROM Personnel_Assignments;
+SELECT * FROM FamilyMembers;
+SELECT * FROM ClubMembers;
+SELECT * FROM Memberships;
+SELECT * FROM Teams;
+SELECT * FROM ClubMembers_Teams;
+SELECT * FROM Payments;
+SELECT COUNT(*) AS Period_Count FROM Period;
+SELECT COUNT(*) AS Locations_Count FROM Locations;
+SELECT COUNT(*) AS CommonInfo_Count FROM CommonInfo;
+SELECT COUNT(*) AS Personnel_Count FROM Personnel;
+SELECT COUNT(*) AS Personnel_Assignments_Count FROM Personnel_Assignments;
+SELECT COUNT(*) AS FamilyMembers_Count FROM FamilyMembers;
+SELECT COUNT(*) AS ClubMembers_Count FROM ClubMembers;
+SELECT COUNT(*) AS Memberships_Count FROM Memberships;
+SELECT COUNT(*) AS Teams_Count FROM Teams;
+SELECT COUNT(*) AS ClubMembers_Teams_Count FROM ClubMembers_Teams;
+SELECT COUNT(*) AS Payments_Count FROM Payments;
+
+SELECT 
+    'Period' AS TableName, COUNT(*) AS RowCount FROM Period
+UNION ALL
+SELECT 
+    'Locations', COUNT(*) FROM Locations
+UNION ALL
+SELECT 
+    'CommonInfo', COUNT(*) FROM CommonInfo
+UNION ALL
+SELECT 
+    'Personnel', COUNT(*) FROM Personnel
+UNION ALL
+SELECT 
+    'Personnel_Assignments', COUNT(*) FROM Personnel_Assignments
+UNION ALL
+SELECT 
+    'FamilyMembers', COUNT(*) FROM FamilyMembers
+UNION ALL
+SELECT 
+    'ClubMembers', COUNT(*) FROM ClubMembers
+UNION ALL
+SELECT 
+    'Memberships', COUNT(*) FROM Memberships
+UNION ALL
+SELECT 
+    'Teams', COUNT(*) FROM Teams
+UNION ALL
+SELECT 
+    'ClubMembers_Teams', COUNT(*) FROM ClubMembers_Teams
+UNION ALL
+SELECT 
+    'Payments', COUNT(*) FROM Payments;
+
+
