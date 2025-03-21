@@ -3,141 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MYVC Database Tables</title>
-    <script>
-        function fetchTable(tableName) {
-            fetch(`http://localhost:5000/get_table?name=${tableName}`)
-                .then(response => response.json())
-                .then(data => {
-                    let tableContent = `<h2>${tableName}</h2><table border='1'><tr>`;
-                    if (data.length > 0) {
-                        Object.keys(data[0]).forEach(key => {
-                            tableContent += `<th>${key}</th>`;
-                        });
-                        tableContent += "</tr>";
-                        data.forEach(row => {
-                            tableContent += "<tr>";
-                            Object.values(row).forEach(value => {
-                                tableContent += `<td>${value}</td>`;
-                            });
-                            tableContent += "</tr>";
-                        });
-                    } else {
-                        tableContent += "<tr><td colspan='100'>No data available</td></tr>";
-                    }
-                    tableContent += "</table>";
-                    document.getElementById("tableDisplay").innerHTML = tableContent;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById("tableDisplay").innerHTML = `<p>Error fetching data for table: ${tableName}</p>`;
-                });
+    <title>MYVC Database System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
         }
-
-        function fetchQuery(queryNumber) {
-            let locationID = "";
-            let familyMemberID = "";
-            let clubMemberID = "";
-
-            if (queryNumber === 2 || queryNumber === 3 || queryNumber === 6) {
-                locationID = document.getElementById(`q${queryNumber}_Input`).value;
-            } else if (queryNumber === 5) {
-                familyMemberID = document.getElementById("q5_Input").value;
-            } else if (queryNumber === 7) {
-                clubMemberID = document.getElementById("q7_Input").value;
-            }
-            console.log(locationID)
-            console.log(familyMemberID)
-            console.log(clubMemberID)
-
-
-            let url = `http://localhost:5000/execute_query?query=${queryNumber}`;
-
-            if (queryNumber === 2 || queryNumber === 3 || queryNumber === 6) {
-                url += `&locationID=${locationID}`;
-            } else if (queryNumber === 5) {
-                url += `&familyMemberID=${familyMemberID}`;
-            } else if (queryNumber === 7) {
-                url += `&clubMemberID=${clubMemberID}`;
-            }
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    let queryContent = `<h2>Query ${queryNumber}</h2><table border='1'><tr>`;
-                    if (data.length > 0) {
-                        Object.keys(data[0]).forEach(key => {
-                            queryContent += `<th>${key}</th>`;
-                        });
-                        queryContent += "</tr>";
-                        data.forEach(row => {
-                            queryContent += "<tr>";
-                            Object.values(row).forEach(value => {
-                                queryContent += `<td>${value}</td>`;
-                            });
-                            queryContent += "</tr>";
-                        });
-                    } else {
-                        queryContent += "<tr><td colspan='100'>No data available</td></tr>";
-                    }
-                    queryContent += "</table>";
-                    document.getElementById("tableDisplay").innerHTML = queryContent;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById("tableDisplay").innerHTML = `<p>Error executing query ${queryNumber}</p>`;
-                });
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-    </script>
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .section-title {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .result-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+        .success {
+            color: #27ae60;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>MYVC Database Tables</h1>
-    <div>
-        <button onclick="fetchTable('Period')">Period</button>
-        <button onclick="fetchTable('Locations')">Locations</button>
-        <button onclick="fetchTable('CommonInfo')">CommonInfo</button>
-        <button onclick="fetchTable('Personnel')">Personnel</button>
-        <button onclick="fetchTable('Personnel_Assignments')">Personnel Assignments</button>
-        <button onclick="fetchTable('FamilyMembers')">Family Members</button>
-        <button onclick="fetchTable('ClubMembers')">Club Members</button>
-        <button onclick="fetchTable('Memberships')">Memberships</button>
-        <button onclick="fetchTable('Teams')">Teams</button>
-        <button onclick="fetchTable('ClubMembers_Teams')">Club Members Teams</button>
-        <button onclick="fetchTable('Payments')">Payments</button>
+    <div class="container">
+        <h1>Montréal Youth Volleyball Club Database System</h1>
 
+        <div class="section">
+            <div class="section-title">Table Views</div>
+            <div class="button-group">
+                <button onclick="getTable('Locations')">Locations</button>
+                <button onclick="getTable('CommonInfo')">Common Info</button>
+                <button onclick="getTable('Personnel')">Personnel</button>
+                <button onclick="getTable('Personnel_Assignments')">Personnel Assignments</button>
+                <button onclick="getTable('FamilyMembers')">Family Members</button>
+                <button onclick="getTable('ClubMembers')">Club Members</button>
+                <button onclick="getTable('Teams')">Teams</button>
+                <button onclick="getTable('TeamFormations')">Team Formations</button>
+                <button onclick="getTable('TeamFormationPlayers')">Team Formation Players</button>
+                <button onclick="getTable('SessionTypes')">Session Types</button>
+                <button onclick="getTable('PlayerRoles')">Player Roles</button>
+                <button onclick="getTable('EmailLogs')">Email Logs</button>
+                <button onclick="getTable('SecondaryFamilyMembers')">Secondary Family Members</button>
+                <button onclick="getTable('SecondaryFamilyMemberRelationships')">Secondary Family Member Relationships</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Queries</div>
+            <div class="button-group">
+                <button onclick="executeQuery('7')">Location Details</button>
+                <button onclick="executeQuery('8')">Family Member Details</button>
+                <button onclick="executeQuery('9')">Team Formation Details</button>
+                <button onclick="executeQuery('10')">Members in Multiple Locations</button>
+                <button onclick="executeQuery('11')">Location Activity Report</button>
+                <button onclick="executeQuery('12')">Inactive Members</button>
+                <button onclick="executeQuery('13')">Outside Hitter Only Members</button>
+                <button onclick="executeQuery('14')">All-Round Players</button>
+                <button onclick="executeQuery('15')">Team Captains</button>
+                <button onclick="executeQuery('16')">Undefeated Players</button>
+                <button onclick="executeQuery('17')">Treasurer History</button>
+                <button onclick="executeQuery('18')">Deactivated Members</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">System Actions</div>
+            <div class="button-group">
+                <button onclick="sendTeamFormationEmails()">Send Team Formation Emails</button>
+                <button onclick="checkMemberAge()">Check Member Age</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Query Parameters</div>
+            <div class="input-group">
+                <label for="locationID">Location ID:</label>
+                <input type="number" id="locationID" placeholder="Enter Location ID">
+            </div>
+            <div class="input-group">
+                <label for="familyMemberID">Family Member ID:</label>
+                <input type="number" id="familyMemberID" placeholder="Enter Family Member ID">
+            </div>
+            <div class="input-group">
+                <label for="clubMemberID">Club Member ID:</label>
+                <input type="number" id="clubMemberID" placeholder="Enter Club Member ID">
+            </div>
+            <div class="input-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="input-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate">
+            </div>
+        </div>
+
+        <div class="result-container">
+            <div id="result"></div>
+        </div>
     </div>
-    <div>
 
-        <!-- Buttons for SQL Queries -->
-        <button onclick="fetchQuery(1)">Location Report</button>
-        <div>
-        <input type="text" id="q2_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(2)">Personnel Report</button>
-        </div>
-        <div>
+    <script>
+        async function getTable(tableName) {
+            try {
+                const response = await fetch(`http://localhost:5000/get_table?name=${tableName}`);
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<div class="error">Error fetching data: ${error.message}</div>`;
+            }
+        }
 
-        <input type="text" id="q3_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(3)">Personnel Report</button>
-        </div>
-        <button onclick="fetchQuery(4)">All Club Members</button>
-        <div>
+        async function executeQuery(queryNumber) {
+            try {
+                const locationID = document.getElementById('locationID').value;
+                const familyMemberID = document.getElementById('familyMemberID').value;
+                const clubMemberID = document.getElementById('clubMemberID').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
 
+                let url = `http://localhost:5000/execute_query?query=${queryNumber}`;
+                if (locationID) url += `&locationID=${locationID}`;
+                if (familyMemberID) url += `&familyMemberID=${familyMemberID}`;
+                if (clubMemberID) url += `&clubMemberID=${clubMemberID}`;
+                if (startDate) url += `&startDate=${startDate}`;
+                if (endDate) url += `&endDate=${endDate}`;
 
-        <input type="text" id="q5_Input" placeholder="Enter Family member ID">
-        <button onclick="fetchQuery(5)">Family Member's Club Members</button>
-        </div>
-        <div>
+                const response = await fetch(url);
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<div class="error">Error executing query: ${error.message}</div>`;
+            }
+        }
 
-        <input type="text" id="q6_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(6)">Active Club Members with Personnel</button>
-        </div>
-        <div>
+        async function sendTeamFormationEmails() {
+            try {
+                const response = await fetch('http://localhost:5000/send_team_formation_email', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `<div class="success">${data.message}</div>`;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<div class="error">Error sending emails: ${error.message}</div>`;
+            }
+        }
 
-        <input type="text" id="q7_Input" placeholder="Enter Club Member ID">
-        <button onclick="fetchQuery(7)">Club Member's Payments</button>
-        </div>
-        <button onclick="fetchQuery(8)">Membership Fees and Donations (2024)</button>
-    </div>
-    <div id="tableDisplay"></div>
+        async function checkMemberAge() {
+            try {
+                const response = await fetch('http://localhost:5000/check_member_age', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `<div class="success">${data.message}</div>`;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<div class="error">Error checking member age: ${error.message}</div>`;
+            }
+        }
+
+        function displayResult(data) {
+            if (data.error) {
+                document.getElementById('result').innerHTML = `<div class="error">${data.error}</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                document.getElementById('result').innerHTML = '<div>No results found</div>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            // Create header row
+            const headerRow = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create data rows
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('result').appendChild(table);
+        }
+    </script>
 </body>
 </html>
