@@ -113,28 +113,28 @@ INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumbe
 INSERT INTO Period ( StartDate, EndDate)
 VALUES
 ('2025-01-01', NULL);
-INSERT INTO Personnel (CommonID, Role, Mandate)
+INSERT INTO Personnel (CommonID, Role, Mandate,LocationID)
 VALUES
-  (1, 'General Manager', 'Salaried'),
-  (2, 'Administrator', 'Salaried'),
-  (3, 'Coach', 'Salaried'),
-  (4, 'Assistant Coach', 'Volunteer'),
-  (5, 'Administrator', 'Salaried'),
-  (6, 'Coach', 'Salaried'),
-  (7, 'Assistant Coach', 'Volunteer'),
-  (8, 'Coach', 'Salaried'),
-  (9, 'Administrator', 'Salaried'),
-  (10, 'Assistant Coach', 'Volunteer'),
-  (11, 'Administrator', 'Salaried'),
-  (12, 'Coach', 'Volunteer'),
-  (13, 'Administrator', 'Salaried'),
-  (14, 'Coach', 'Salaried'),
-  (15, 'Assistant Coach', 'Volunteer'),
-  (16, 'Administrator', 'Salaried'),
-  (17, 'Coach', 'Salaried'),
-  (18, 'Assistant Coach', 'Volunteer'),
-  (19, 'Administrator', 'Salaried'),
-  (20, 'Coach', 'Salaried');
+  (1, 'General Manager', 'Salaried',1),
+  (2, 'Administrator', 'Salaried',1),
+  (3, 'Coach', 'Salaried',2),
+  (4, 'Assistant Coach', 'Volunteer',2),
+  (5, 'Administrator', 'Salaried',3),
+  (6, 'Coach', 'Salaried',3),
+  (7, 'Assistant Coach', 'Volunteer',4),
+  (8, 'Coach', 'Salaried',4),
+  (9, 'Administrator', 'Salaried',5),
+  (10, 'Assistant Coach', 'Volunteer',5),
+  (11, 'Administrator', 'Salaried',6),
+  (12, 'Coach', 'Volunteer',6),
+  (13, 'Administrator', 'Salaried',7),
+  (14, 'Coach', 'Salaried',7),
+  (15, 'Assistant Coach', 'Volunteer',8),
+  (16, 'Administrator', 'Salaried',8),
+  (17, 'Coach', 'Salaried',9),
+  (18, 'Assistant Coach', 'Volunteer',9),
+  (19, 'Administrator', 'Salaried',10),
+  (20, 'Coach', 'Salaried',10);
 
 INSERT INTO Personnel_Assignments (PersonnelID, LocationID, PeriodID)
 VALUES
@@ -396,7 +396,7 @@ SET SQL_SAFE_UPDATES = 1;
 
 
 
--- i. Get complete details for every location
+-- Q1
 SELECT 
     l.Name AS LocationName,
     l.Address,
@@ -412,8 +412,7 @@ SELECT
     (SELECT COUNT(*) FROM ClubMembers cm WHERE cm.LocationID = l.LocationID) AS ClubMembersCount
 FROM Locations l
 ORDER BY l.Province, l.City;
-
--- ii. For a given location, provide a report about family members with active club members
+-- Q2
 SELECT 
     ci.FirstName AS FamilyMemberFirstName,
     ci.LastName AS FamilyMemberLastName,
@@ -428,7 +427,7 @@ WHERE l.LocationID = 1
 GROUP BY fm.FamilyMemberID;
 
 
--- iii. For a given location, report on personnel
+-- Q3
 SELECT 
     ci.FirstName,
     ci.LastName,
@@ -450,7 +449,7 @@ JOIN Locations l ON pa.LocationID = l.LocationID
 WHERE l.LocationID = 1; 
 
 
--- iv. Get a detailed list of all club members registered in the system
+-- Q4
 SELECT 
     l.Name AS LocationName,
     cm.MemberID AS MembershipNumber,
@@ -468,7 +467,7 @@ WHERE m.Status IN ('Active', 'Inactive')
 ORDER BY l.Name ASC, Age ASC;
 
 
--- v. For a given family member, get details of all club members associated with him/her
+-- Q5
 SELECT 
     m.MembershipID AS ClubMembershipNumber,
     ci.FirstName,
@@ -491,7 +490,7 @@ WHERE fm.FamilyMemberID = 1
 ORDER BY m.MembershipID;
 
 
--- vi. For a given location, get family members with active club members associated and operator personnel
+-- Q6
 SELECT 
     ci.FirstName AS FamilyMemberFirstName,
     ci.LastName AS FamilyMemberLastName,
@@ -505,7 +504,7 @@ JOIN Personnel p ON p.PersonnelID = pa.PersonnelID
 JOIN Locations l ON fm.LocationID = l.LocationID
 WHERE m.Status = 'Active'
 AND p.LocationID = fm.LocationID
-AND p.Role IN ('General Manager', 'Deputy Manager', 'Treasurer', 'Secretary', 'Coach', 'Assistant Coach', 'Captain')  -- Operator roles
+AND p.Role IN ('General Manager', 'Deputy Manager', 'Treasurer', 'Secretary', 'Coach', 'Assistant Coach', 'Captain')
 AND fm.LocationID = 1  
 ORDER BY ci.FirstName, ci.LastName;
 
@@ -514,7 +513,7 @@ ORDER BY ci.FirstName, ci.LastName;
 
 
 
--- vii. For a given club member, give details of all payments for membership fees
+-- Q7
 SELECT 
     p.PaymentDate,
     p.Amount,
@@ -524,7 +523,7 @@ JOIN Memberships m ON p.MembershipID = m.MembershipID
 WHERE m.MemberID = 1
 ORDER BY p.PaymentDate;
 
--- viii. Get the sum of membership fees paid and donations collected by the club in 2024
+-- Q8
 SELECT 
     SUM(p.Amount) AS TotalMembershipFeesPaid,
     SUM(m.DonationAmount) AS TotalDonationsCollected
@@ -595,5 +594,4 @@ SELECT
 UNION ALL
 SELECT 
     'Payments', COUNT(*) FROM Payments;
-
 

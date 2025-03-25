@@ -1,0 +1,165 @@
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Payments;
+DROP TABLE IF EXISTS ClubMembers_Teams;
+DROP TABLE IF EXISTS Teams;
+DROP TABLE IF EXISTS Memberships;
+DROP TABLE IF EXISTS ClubMembers;
+DROP TABLE IF EXISTS FamilyMembers;
+DROP TABLE IF EXISTS Personnel_Assignments;
+DROP TABLE IF EXISTS Personnel;
+DROP TABLE IF EXISTS CommonInfo;
+DROP TABLE IF EXISTS Locations;
+DROP TABLE IF EXISTS Period;
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+CREATE TABLE Period (
+  PeriodID INT AUTO_INCREMENT PRIMARY KEY,
+  StartDate DATE NOT NULL,
+  EndDate date
+);
+
+CREATE TABLE Locations (
+  LocationID INT AUTO_INCREMENT PRIMARY KEY,
+  Type ENUM('Head', 'Branch') NOT NULL,
+  Name VARCHAR(100) NOT NULL,
+  Address VARCHAR(255),
+  City VARCHAR(100),
+  Province VARCHAR(50),
+  PostalCode VARCHAR(10),
+  PhoneNumber VARCHAR(20),
+  WebAddress VARCHAR(100),
+  MaxCapacity INT
+);
+
+CREATE TABLE CommonInfo (
+  CommonID INT AUTO_INCREMENT PRIMARY KEY,
+  FirstName VARCHAR(100),
+  LastName VARCHAR(100),
+  DateOfBirth DATE,
+  SSN CHAR(9) UNIQUE NOT NULL,
+  MedicareCardNumber VARCHAR(20) UNIQUE NOT NULL,
+  PhoneNumber VARCHAR(20),
+  Email VARCHAR(100),
+  Address VARCHAR(255),
+  City VARCHAR(100),
+  Province VARCHAR(50),
+  PostalCode VARCHAR(10)
+);
+
+
+CREATE TABLE Personnel (
+  PersonnelID INT AUTO_INCREMENT PRIMARY KEY,
+  CommonID INT NOT NULL,
+  Role ENUM('Administrator', 'Captain', 'Coach', 'Assistant Coach', 'Other', 'General Manager', 'Deputy Manager', 'Treasurer', 'Secretary') NOT NULL,
+  Mandate ENUM('Volunteer', 'Salaried') NOT NULL,
+  LocationID INT NOT NULL,
+  FOREIGN KEY (CommonID) REFERENCES CommonInfo(CommonID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+ALTER TABLE Personnel
+MODIFY Role ENUM('Administrator', 'Captain', 'Coach', 'Assistant Coach', 'Other', 'General Manager', 'Deputy Manager', 'Treasurer', 'Secretary') NOT NULL;
+ALTER TABLE Personnel
+ADD COLUMN LocationID INT NOT NULL;
+
+
+SET SQL_SAFE_UPDATES = 0;
+UPDATE Personnel p
+JOIN Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
+SET p.LocationID = pa.LocationID;
+
+SET SQL_SAFE_UPDATES = 1;
+
+
+ALTER TABLE Personnel
+ADD CONSTRAINT fk_location
+FOREIGN KEY (LocationID) REFERENCES Locations(LocationID);
+-- Create Personnel_Assignments Table
+CREATE TABLE Personnel_Assignments (
+  AssignmentID INT AUTO_INCREMENT PRIMARY KEY,
+  PersonnelID INT NOT NULL,
+  LocationID INT NOT NULL,
+  PeriodID INT NOT NULL,
+  FOREIGN KEY (PersonnelID) REFERENCES Personnel(PersonnelID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
+  FOREIGN KEY (PeriodID) REFERENCES Period(PeriodID)
+);
+
+
+CREATE TABLE FamilyMembers (
+  FamilyMemberID INT AUTO_INCREMENT PRIMARY KEY,
+  CommonID INT NOT NULL,
+  LocationID INT,
+  Relationship ENUM('Father', 'Mother', 'Grandfather', 'Grandmother', 'Tutor', 'Partner', 'Friend', 'Other'),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
+  FOREIGN KEY (CommonID) REFERENCES CommonInfo(CommonID)
+);
+
+CREATE TABLE ClubMembers (
+  MemberID INT AUTO_INCREMENT PRIMARY KEY,
+  CommonID INT NOT NULL,
+  FamilyMemberID INT NOT NULL,
+  LocationID INT,
+  Height DECIMAL(5, 2),
+  Weight DECIMAL(5, 2),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
+  FOREIGN KEY (CommonID) REFERENCES CommonInfo(CommonID),
+  FOREIGN KEY (FamilyMemberID) REFERENCES FamilyMembers(FamilyMemberID)
+);
+
+
+CREATE TABLE Memberships (
+  MembershipID INT AUTO_INCREMENT PRIMARY KEY,
+  MemberID INT NOT NULL,
+  Year INT NOT NULL,
+  Status ENUM('Active', 'Inactive') DEFAULT 'Active',
+  TotalPaid DECIMAL(10, 2) DEFAULT 0,
+  DonationAmount DECIMAL(10, 2) AS (GREATEST(TotalPaid - 100, 0)) STORED,
+  FOREIGN KEY (MemberID) REFERENCES ClubMembers(MemberID)
+);
+
+CREATE TABLE Teams (
+  TeamID INT AUTO_INCREMENT PRIMARY KEY,
+  TeamName VARCHAR(100),
+  TeamType ENUM('Boys', 'Girls'),
+  LocationID INT NOT NULL,
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+
+
+CREATE TABLE ClubMembers_Teams (
+  TeamID INT,
+  MemberID INT,
+  LocationID INT,
+  PRIMARY KEY (TeamID, MemberID),
+  FOREIGN KEY (TeamID) REFERENCES Teams(TeamID),
+  FOREIGN KEY (MemberID) REFERENCES ClubMembers(MemberID),
+  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID)
+);
+
+CREATE TABLE Payments (
+  PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+  MembershipID INT NOT NULL,
+  PaymentDate DATE NOT NULL,
+  Amount DECIMAL(10, 2) NOT NULL,
+  PaymentMethod ENUM('Cash', 'Debit', 'Credit'),
+  FOREIGN KEY (MembershipID) REFERENCES Memberships(MembershipID)
+);
+
+
+
+
+
+
+SELECT * FROM Period;
+SELECT * FROM Locations;
+SELECT * FROM CommonInfo;
+SELECT * FROM Personnel;
+SELECT * FROM Personnel_Assignments;
+SELECT * FROM FamilyMembers;
+SELECT * FROM ClubMembers;
+SELECT * FROM Memberships;
+SELECT * FROM Teams;
+SELECT * FROM ClubMembers_Teams;
+SELECT * FROM Payments;
