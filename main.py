@@ -5,41 +5,65 @@ from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
 # Enable CORS for all domains (or restrict to specific domains for more security)
 CORS(app, origins="http://localhost:63342")
 
-# Database connection parameters
-host = 'localhost'
-user = 'root'
-password = 'n3u8c5t9A!'
-database = 'warmup'
+# Database configuration
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'db': 'myvc_db',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor
+}
 
 # Email configuration
-SMTP_SERVER = 'smtp.gmail.com'
-SMTP_PORT = 587
-SMTP_USERNAME = 'your-email@gmail.com'
-SMTP_PASSWORD = 'your-app-password'
+EMAIL_CONFIG = {
+    'smtp_server': os.getenv('SMTP_SERVER', 'smtp.gmail.com'),
+    'smtp_port': int(os.getenv('SMTP_PORT', 587)),
+    'sender_email': os.getenv('SENDER_EMAIL'),
+    'sender_password': os.getenv('SENDER_PASSWORD')
+}
 
 # Create a database connection
 def get_db_connection():
-    return pymysql.connect(host=host, user=user, password=password, database=database)
+    return pymysql.connect(**DB_CONFIG)
 
-def send_email(recipient, subject, body):
+def send_email(recipient, subject, body, cc_list=None):
     try:
         msg = MIMEMultipart()
-        msg['From'] = SMTP_USERNAME
+        msg['From'] = EMAIL_CONFIG['sender_email']
         msg['To'] = recipient
+        if cc_list:
+            msg['Cc'] = cc_list
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
         
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server = smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
         server.starttls()
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.login(EMAIL_CONFIG['sender_email'], EMAIL_CONFIG['sender_password'])
         server.send_message(msg)
         server.quit()
+
+        # Log the email
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO EmailLogs (EmailDate, Sender, Recipient, CCList, Subject, BodyPreview, EmailType)
+                VALUES (NOW(), %s, %s, %s, %s, %s, %s)
+            """, (EMAIL_CONFIG['sender_email'], recipient, cc_list, subject, body[:100], 'System'))
+        conn.commit()
+        conn.close()
+
         return True
     except Exception as e:
         print(f"Error sending email: {str(e)}")
