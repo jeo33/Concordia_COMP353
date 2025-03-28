@@ -1,3 +1,24 @@
+SHOW TABLES;
+SELECT * FROM Period;
+SELECT * FROM Locations;
+SELECT * FROM CommonInfo;
+SELECT * FROM Personnel;
+SELECT * FROM Personnel_Assignments;
+SELECT * FROM FamilyMembers;
+SELECT * FROM ClubMembers;
+SELECT * FROM Memberships;
+SELECT * FROM Teams;
+SELECT * FROM ClubMembers_Teams;
+SELECT * FROM Payments;
+SELECT * FROM SessionTypes;
+SELECT * FROM PlayerRoles;
+SELECT * FROM TeamFormations;
+SELECT * FROM TeamFormationPlayers;
+SELECT * FROM EmailLogs;
+SELECT * FROM SecondaryFamilyMembers;
+SELECT * FROM SecondaryFamilyMemberRelationships;
+
+
 -- Insert sample data for Locations
 INSERT INTO Locations (Name, Type, Address, City, Province, PostalCode, PhoneNumber, WebAddress, MaxCapacity) VALUES
 ('MYVC Head Office', 'Head', '123 Main St', 'Montreal', 'Quebec', 'H1A 1A1', '514-555-0123', 'www.myvc.ca', 100),
@@ -18,11 +39,11 @@ INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumbe
 ('Mike', 'Johnson', '1990-03-20', '456789123', 'DEF456789', '450-555-0127', 'mike.johnson@myvc.ca', '789 Longueuil Blvd', 'Longueuil', 'Quebec', 'J4K 3C3'),
 ('Robert', 'Wilson', '1975-04-10', '111222333', 'GHI789012', '514-555-0128', 'robert.wilson@email.com', '321 Oak St', 'Montreal', 'Quebec', 'H1A 1A2'),
 ('Mary', 'Brown', '1978-05-25', '444555666', 'JKL012345', '450-555-0129', 'mary.brown@email.com', '654 Pine Ave', 'Laval', 'Quebec', 'H7A 2B3'),
-('Alice', 'Green', '1982-06-18', '222333444', 'LMN567890', '438-555-0130', 'alice.green@email.com', '890 Elm St', 'Brossard', 'Quebec', 'J4W 1A3'),
-('Brian', 'Adams', '1987-09-12', '555666777', 'OPQ678901', '418-555-0131', 'brian.adams@email.com', '321 Maple St', 'Quebec City', 'Quebec', 'G1A 3B5'),
-('Sam', 'O’Connor', '1992-11-21', '678123456', 'PQR987654', '514-555-0132', 'sam.oconnor@email.com', '432 Oak Ave', 'Montreal', 'Quebec', 'H1A 1B3'),
-('Lisa', 'Davis', '1989-03-12', '234567891', 'STU345678', '450-555-0133', 'lisa.davis@email.com', '543 Maple Ave', 'Laval', 'Quebec', 'H7A 2B4'),
-('Chris', 'Thompson', '1984-09-01', '987123456', 'VWX567890', '514-555-0134', 'chris.thompson@email.com', '654 Oak Blvd', 'Longueuil', 'Quebec', 'J4K 3D5');
+('Alice', 'Green', '2013-06-18', '222333444', 'LMN567890', '438-555-0130', 'alice.green@email.com', '890 Elm St', 'Brossard', 'Quebec', 'J4W 1A3'),
+('Brian', 'Adams', '2013-09-12', '555666777', 'OPQ678901', '418-555-0131', 'brian.adams@email.com', '321 Maple St', 'Quebec City', 'Quebec', 'G1A 3B5'),
+('Sam', 'O’Connor', '2013-11-21', '678123456', 'PQR987654', '514-555-0132', 'sam.oconnor@email.com', '432 Oak Ave', 'Montreal', 'Quebec', 'H1A 1B3'),
+('Lisa', 'Davis', '2013-03-12', '234567891', 'STU345678', '450-555-0133', 'lisa.davis@email.com', '543 Maple Ave', 'Laval', 'Quebec', 'H7A 2B4'),
+('Chris', 'Thompson', '2013-09-01', '987123456', 'VWX567890', '514-555-0134', 'chris.thompson@email.com', '654 Oak Blvd', 'Longueuil', 'Quebec', 'J4K 3D5');
 
 -- Insert sample data for Personnel
 INSERT INTO Personnel (CommonID, Role, Mandate, LocationID) VALUES
@@ -33,7 +54,7 @@ INSERT INTO Personnel (CommonID, Role, Mandate, LocationID) VALUES
 (5, 'Treasurer', 'Salaried', 5),
 (6, 'Secretary', 'Volunteer', 1),
 (7, 'Administrator', 'Salaried', 2),
-(8, 'Team Manager', 'Salaried', 6),
+(8, 'Coach', 'Salaried', 6),
 (9, 'Coach', 'Salaried', 7),
 (10, 'Administrator', 'Salaried', 3);
 
@@ -41,16 +62,16 @@ INSERT INTO Personnel (CommonID, Role, Mandate, LocationID) VALUES
 INSERT INTO FamilyMembers (CommonID, LocationID, Relationship) VALUES
 (4, 1, 'Father'),
 (5, 2, 'Mother'),
-(6, 3, 'Grandfather'),
+(6, 3, 'Friend'),
 (7, 4, 'Tutor'),
-(8, 5, 'Brother'),
-(9, 6, 'Sister'),
-(10, 7, 'Guardian');
+(8, 5, 'Friend'),
+(9, 6, 'Friend'),
+(10, 7, 'Partner');
 
 -- Insert sample data for Club Members
 INSERT INTO CommonInfo (FirstName, LastName, DateOfBirth, SSN, MedicareCardNumber, PhoneNumber, Email, Address, City, Province, PostalCode) VALUES
-('Tom', 'Wilson', '2008-07-15', '123123123', 'PQR678901', '514-555-0131', 'tom.wilson@email.com', '321 Oak St', 'Montreal', 'Quebec', 'H1A 1A2'),
-('Sarah', 'Brown', '2009-08-20', '456456456', 'STU901234', '450-555-0132', 'sarah.brown@email.com', '654 Pine Ave', 'Laval', 'Quebec', 'H7A 2B3'),
+('Tom', 'Wilson', '2010-07-15', '123123123', 'PQR678901', '514-555-0131', 'tom.wilson@email.com', '321 Oak St', 'Montreal', 'Quebec', 'H1A 1A2'),
+('Sarah', 'Brown', '2010-08-20', '456456456', 'STU901234', '450-555-0132', 'sarah.brown@email.com', '654 Pine Ave', 'Laval', 'Quebec', 'H7A 2B3'),
 ('Jack', 'Miller', '2010-10-05', '789789789', 'UVW345678', '514-555-0133', 'jack.miller@email.com', '890 Elm St', 'Brossard', 'Quebec', 'J4W 1A3'),
 ('David', 'Green', '2011-01-30', '555123555', 'PQR456789', '438-555-0134', 'david.green@email.com', '123 Maple St', 'Montreal', 'Quebec', 'H1A 1A4'),
 ('Emma', 'Adams', '2012-02-12', '666234666', 'RST567890', '450-555-0135', 'emma.adams@email.com', '321 Pine Ave', 'Laval', 'Quebec', 'H7A 2B5'),
@@ -63,10 +84,7 @@ INSERT INTO ClubMembers (CommonID, FamilyMemberID, LocationID, Height, Weight) V
 (9, 4, 4, 160, 55),
 (10, 5, 5, 175, 70),
 (11, 6, 6, 150, 50),
-(12, 7, 7, 185, 80),
-(13, 8, 8, 168, 58),
-(14, 9, 9, 172, 68),
-(15, 10, 10, 160, 52);
+(12, 7, 7, 185, 80);
 
 -- Insert sample data for Teams
 INSERT INTO Teams (TeamName, TeamType, LocationID) VALUES
@@ -80,6 +98,9 @@ INSERT INTO Teams (TeamName, TeamType, LocationID) VALUES
 ('Montreal Boys U13', 'Boys', 5),
 ('Laval Girls U17', 'Girls', 6),
 ('Sherbrooke Boys U14', 'Boys', 7);
+
+
+
 
 -- Insert sample data for Team Formations
 INSERT INTO TeamFormations (TeamID, SessionTypeID, SessionDate, StartTime, EndTime, Address, Score) VALUES
@@ -102,10 +123,7 @@ INSERT INTO TeamFormationPlayers (FormationID, MemberID, RoleID) VALUES
 (4, 4, 1),
 (5, 5, 2),
 (6, 6, 3),
-(7, 7, 1),
-(8, 8, 2),
-(9, 9, 3),
-(10, 10, 1);
+(7, 7, 1);
 
 -- Insert sample data for Email Logs
 INSERT INTO EmailLogs (EmailDate, Sender, Recipient, CCList, Subject, BodyPreview, EmailType) VALUES
