@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS EmailLogs;
 DROP TABLE IF EXISTS SecondaryFamilyMembers;
 DROP TABLE IF EXISTS SecondaryFamilyMemberRelationships;
 SET FOREIGN_KEY_CHECKS = 1;
-use  new_test;
+use  test;
 -- Create Period Table
 CREATE TABLE Period (
   PeriodID INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +66,7 @@ CREATE TABLE Personnel (
   FOREIGN KEY (CommonID) REFERENCES CommonInfo(CommonID)
 );
 ALTER TABLE Personnel
-MODIFY Role ENUM('Administrator', 'Captain', 'Coach', 'Assistant Coach', 'Other', 'General Manager', 'Deputy Manager', 'Treasurer', 'Secretary') NOT NULL;
+MODIFY Role ENUM('Administrator', 'Captain', 'Coach', 'Assistant Coach', 'Other','Team Manager' , 'General Manager', 'Deputy Manager', 'Treasurer', 'Secretary') NOT NULL;
 ALTER TABLE Personnel
 ADD COLUMN LocationID INT NOT NULL;
 
@@ -161,11 +161,21 @@ CREATE TABLE SessionTypes (
   Type ENUM('Training', 'Game') NOT NULL
 );
 
+
+
+-- session types
+INSERT INTO SessionTypes (Type) VALUES
+('Training'), ('Game');
+
 -- Create PlayerRoles Table
 CREATE TABLE PlayerRoles (
   RoleID INT AUTO_INCREMENT PRIMARY KEY,
   RoleName ENUM('Outside Hitter', 'Opposite', 'Setter', 'Middle Blocker', 'Libero', 'Defensive Specialist', 'Serving Specialist') NOT NULL
 );
+-- session types
+INSERT INTO PlayerRoles (RoleName) VALUES
+('Outside Hitter'), ('Opposite'), ('Setter'), ('Middle Blocker'),
+ ('Libero'), ('Defensive Specialist'), ('Serving Specialist');
 
 -- Create TeamFormations Table
 CREATE TABLE TeamFormations (
@@ -201,7 +211,7 @@ CREATE TABLE EmailLogs (
   CCList VARCHAR(255),
   Subject VARCHAR(255) NOT NULL,
   BodyPreview VARCHAR(100) NOT NULL,
-  EmailType ENUM('TeamFormation', 'Deactivation') NOT NULL
+  EmailType ENUM('Team Formation', 'Deactivation') NOT NULL
 );
 
 -- Create SecondaryFamilyMembers Table
