@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS EmailLogs;
 DROP TABLE IF EXISTS SecondaryFamilyMembers;
 DROP TABLE IF EXISTS SecondaryFamilyMemberRelationships;
 SET FOREIGN_KEY_CHECKS = 1;
-use  warmup;
+use  new_test;
 -- Create Period Table
 CREATE TABLE Period (
   PeriodID INT AUTO_INCREMENT PRIMARY KEY,
@@ -71,12 +71,7 @@ ALTER TABLE Personnel
 ADD COLUMN LocationID INT NOT NULL;
 
 
-SET SQL_SAFE_UPDATES = 0;
-UPDATE Personnel p
-JOIN Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
-SET p.LocationID = pa.LocationID;
 
-SET SQL_SAFE_UPDATES = 1;
 
 
 ALTER TABLE Personnel
@@ -92,7 +87,12 @@ CREATE TABLE Personnel_Assignments (
   FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
   FOREIGN KEY (PeriodID) REFERENCES Period(PeriodID)
 );
+SET SQL_SAFE_UPDATES = 0;
+UPDATE Personnel p
+JOIN Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
+SET p.LocationID = pa.LocationID;
 
+SET SQL_SAFE_UPDATES = 1;
 -- Create FamilyMembers Table
 CREATE TABLE FamilyMembers (
   FamilyMemberID INT AUTO_INCREMENT PRIMARY KEY,
