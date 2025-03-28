@@ -3,141 +3,438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MYVC Database Tables</title>
-    <script>
-        function fetchTable(tableName) {
-            fetch(`http://localhost:5000/get_table?name=${tableName}`)
-                .then(response => response.json())
-                .then(data => {
-                    let tableContent = `<h2>${tableName}</h2><table border='1'><tr>`;
-                    if (data.length > 0) {
-                        Object.keys(data[0]).forEach(key => {
-                            tableContent += `<th>${key}</th>`;
-                        });
-                        tableContent += "</tr>";
-                        data.forEach(row => {
-                            tableContent += "<tr>";
-                            Object.values(row).forEach(value => {
-                                tableContent += `<td>${value}</td>`;
-                            });
-                            tableContent += "</tr>";
-                        });
-                    } else {
-                        tableContent += "<tr><td colspan='100'>No data available</td></tr>";
-                    }
-                    tableContent += "</table>";
-                    document.getElementById("tableDisplay").innerHTML = tableContent;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById("tableDisplay").innerHTML = `<p>Error fetching data for table: ${tableName}</p>`;
-                });
+    <title>Montréal Youth Volleyball Club Database System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-
-        function fetchQuery(queryNumber) {
-            let locationID = "";
-            let familyMemberID = "";
-            let clubMemberID = "";
-
-            if (queryNumber === 2 || queryNumber === 3 || queryNumber === 6) {
-                locationID = document.getElementById(`q${queryNumber}_Input`).value;
-            } else if (queryNumber === 5) {
-                familyMemberID = document.getElementById("q5_Input").value;
-            } else if (queryNumber === 7) {
-                clubMemberID = document.getElementById("q7_Input").value;
-            }
-            console.log(locationID)
-            console.log(familyMemberID)
-            console.log(clubMemberID)
-
-
-            let url = `http://localhost:5000/execute_query?query=${queryNumber}`;
-
-            if (queryNumber === 2 || queryNumber === 3 || queryNumber === 6) {
-                url += `&locationID=${locationID}`;
-            } else if (queryNumber === 5) {
-                url += `&familyMemberID=${familyMemberID}`;
-            } else if (queryNumber === 7) {
-                url += `&clubMemberID=${clubMemberID}`;
-            }
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    let queryContent = `<h2>Query ${queryNumber}</h2><table border='1'><tr>`;
-                    if (data.length > 0) {
-                        Object.keys(data[0]).forEach(key => {
-                            queryContent += `<th>${key}</th>`;
-                        });
-                        queryContent += "</tr>";
-                        data.forEach(row => {
-                            queryContent += "<tr>";
-                            Object.values(row).forEach(value => {
-                                queryContent += `<td>${value}</td>`;
-                            });
-                            queryContent += "</tr>";
-                        });
-                    } else {
-                        queryContent += "<tr><td colspan='100'>No data available</td></tr>";
-                    }
-                    queryContent += "</table>";
-                    document.getElementById("tableDisplay").innerHTML = queryContent;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById("tableDisplay").innerHTML = `<p>Error executing query ${queryNumber}</p>`;
-                });
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-    </script>
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 4px;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
-    <h1>MYVC Database Tables</h1>
-    <div>
-        <button onclick="fetchTable('Period')">Period</button>
-        <button onclick="fetchTable('Locations')">Locations</button>
-        <button onclick="fetchTable('CommonInfo')">CommonInfo</button>
-        <button onclick="fetchTable('Personnel')">Personnel</button>
-        <button onclick="fetchTable('Personnel_Assignments')">Personnel Assignments</button>
-        <button onclick="fetchTable('FamilyMembers')">Family Members</button>
-        <button onclick="fetchTable('ClubMembers')">Club Members</button>
-        <button onclick="fetchTable('Memberships')">Memberships</button>
-        <button onclick="fetchTable('Teams')">Teams</button>
-        <button onclick="fetchTable('ClubMembers_Teams')">Club Members Teams</button>
-        <button onclick="fetchTable('Payments')">Payments</button>
+    <div class="container">
+        <h1>Montréal Youth Volleyball Club Database System</h1>
 
+        <!-- Table Views Section -->
+        <div class="section">
+            <h2>Table Views</h2>
+            <div class="button-group">
+                <button onclick="getTable('Locations')">Locations</button>
+                <button onclick="getTable('Personnel')">Personnel</button>
+                <button onclick="getTable('FamilyMembers')">Family Members</button>
+                <button onclick="getTable('ClubMembers')">Club Members</button>
+                <button onclick="getTable('Teams')">Teams</button>
+                <button onclick="getTable('TeamFormations')">Team Formations</button>
+                <button onclick="getTable('EmailLogs')">Email Logs</button>
+            </div>
+        </div>
+
+        <!-- CRUD Operations Section -->
+        <div class="section">
+            <h2>CRUD Operations</h2>
+            <div class="button-group">
+                <button onclick="showModal('locationModal')">Manage Locations</button>
+                <button onclick="showModal('personnelModal')">Manage Personnel</button>
+                <button onclick="showModal('familyMemberModal')">Manage Family Members</button>
+                <button onclick="showModal('clubMemberModal')">Manage Club Members</button>
+                <button onclick="showModal('teamFormationModal')">Manage Team Formations</button>
+            </div>
+        </div>
+
+        <!-- Queries Section -->
+        <div class="section">
+            <h2>Queries</h2>
+            <div class="button-group">
+                <button onclick="executeQuery(7)">Location Details</button>
+                <button onclick="executeQuery(8)">Family Member Details</button>
+                <button onclick="executeQuery(9)">Team Formation Details</button>
+                <button onclick="executeQuery(10)">Active Members</button>
+                <button onclick="executeQuery(11)">Team Formation Report</button>
+                <button onclick="executeQuery(12)">Unassigned Members</button>
+                <button onclick="executeQuery(13)">Outside Hitters</button>
+                <button onclick="executeQuery(14)">All-Round Players</button>
+                <button onclick="executeQuery(15)">Family Member Captains</button>
+                <button onclick="executeQuery(16)">Undefeated Players</button>
+                <button onclick="executeQuery(17)">Treasurer History</button>
+                <button onclick="executeQuery(18)">Deactivated Members</button>
+            </div>
+        </div>
+
+        <!-- System Actions Section -->
+        <div class="section">
+            <h2>System Actions</h2>
+            <div class="button-group">
+                <button onclick="sendTeamFormationEmails()">Send Team Formation Emails</button>
+                <button onclick="checkMemberAge()">Check Member Age</button>
+            </div>
+        </div>
+
+        <!-- Query Parameters Section -->
+        <div class="section">
+            <h2>Query Parameters</h2>
+            <div class="form-group">
+                <label for="locationID">Location ID:</label>
+                <input type="number" id="locationID" placeholder="Enter Location ID">
+            </div>
+            <div class="form-group">
+                <label for="familyMemberID">Family Member ID:</label>
+                <input type="number" id="familyMemberID" placeholder="Enter Family Member ID">
+            </div>
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate">
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section">
+            <h2>Results</h2>
+            <div id="results"></div>
+        </div>
     </div>
-    <div>
 
-        <!-- Buttons for SQL Queries -->
-        <button onclick="fetchQuery(1)">Location Report</button>
-        <div>
-        <input type="text" id="q2_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(2)">Personnel Report</button>
+    <!-- Location Modal -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('locationModal')">&times;</span>
+            <h2>Manage Locations</h2>
+            <form id="locationForm">
+                <div class="form-group">
+                    <label for="locationName">Name:</label>
+                    <input type="text" id="locationName" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationType">Type:</label>
+                    <select id="locationType" required>
+                        <option value="Head">Head</option>
+                        <option value="Branch">Branch</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="locationAddress">Address:</label>
+                    <input type="text" id="locationAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationCity">City:</label>
+                    <input type="text" id="locationCity" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationProvince">Province:</label>
+                    <input type="text" id="locationProvince" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationPostalCode">Postal Code:</label>
+                    <input type="text" id="locationPostalCode" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationPhone">Phone Number:</label>
+                    <input type="tel" id="locationPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationWeb">Web Address:</label>
+                    <input type="url" id="locationWeb" required>
+                </div>
+                <div class="form-group">
+                    <label for="locationCapacity">Max Capacity:</label>
+                    <input type="number" id="locationCapacity" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Create Location</button>
+                    <button type="button" onclick="updateLocation()">Update Location</button>
+                    <button type="button" onclick="deleteLocation()">Delete Location</button>
+                </div>
+            </form>
         </div>
-        <div>
-
-        <input type="text" id="q3_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(3)">Personnel Report</button>
-        </div>
-        <button onclick="fetchQuery(4)">All Club Members</button>
-        <div>
-
-
-        <input type="text" id="q5_Input" placeholder="Enter Family member ID">
-        <button onclick="fetchQuery(5)">Family Member's Club Members</button>
-        </div>
-        <div>
-
-        <input type="text" id="q6_Input" placeholder="Enter Location ID">
-        <button onclick="fetchQuery(6)">Active Club Members with Personnel</button>
-        </div>
-        <div>
-
-        <input type="text" id="q7_Input" placeholder="Enter Club Member ID">
-        <button onclick="fetchQuery(7)">Club Member's Payments</button>
-        </div>
-        <button onclick="fetchQuery(8)">Membership Fees and Donations (2024)</button>
     </div>
-    <div id="tableDisplay"></div>
+
+    <!-- Similar modals for other entities... -->
+
+    <script>
+        // Show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        // Hide modal
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Get table data
+        async function getTable(tableName) {
+            try {
+                const response = await fetch(`/get_table?table=${tableName}`);
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to fetch table data');
+            }
+        }
+
+        // Execute query
+        async function executeQuery(queryNumber) {
+            try {
+                const params = new URLSearchParams({
+                    query: queryNumber,
+                    locationID: document.getElementById('locationID').value,
+                    familyMemberID: document.getElementById('familyMemberID').value,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value
+                });
+
+                const response = await fetch(`/execute_query?${params}`);
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to execute query');
+            }
+        }
+
+        // Send team formation emails
+        async function sendTeamFormationEmails() {
+            try {
+                const response = await fetch('/send_team_formation_email');
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to send team formation emails');
+            }
+        }
+
+        // Check member age
+        async function checkMemberAge() {
+            try {
+                const response = await fetch('/check_member_age');
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to check member age');
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            if (!data || data.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            // Create header
+            const headerRow = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create body
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            resultsDiv.innerHTML = '';
+            resultsDiv.appendChild(table);
+        }
+
+        // Display error
+        function displayError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<p class="error">${message}</p>`;
+        }
+
+        // Form submission handlers
+        document.getElementById('locationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/create_location', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    displaySuccess('Location created successfully');
+                    hideModal('locationModal');
+                    getTable('Locations');
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to create location');
+            }
+        });
+
+        // Update location
+        async function updateLocation() {
+            try {
+                const formData = new FormData(document.getElementById('locationForm'));
+                const response = await fetch('/update_location', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    displaySuccess('Location updated successfully');
+                    hideModal('locationModal');
+                    getTable('Locations');
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to update location');
+            }
+        }
+
+        // Delete location
+        async function deleteLocation() {
+            try {
+                const locationId = document.getElementById('locationID').value;
+                const response = await fetch(`/delete_location?id=${locationId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    displaySuccess('Location deleted successfully');
+                    hideModal('locationModal');
+                    getTable('Locations');
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Failed to delete location');
+            }
+        }
+
+        // Display success message
+        function displaySuccess(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<p class="success">${message}</p>`;
+        }
+    </script>
 </body>
 </html>
+
