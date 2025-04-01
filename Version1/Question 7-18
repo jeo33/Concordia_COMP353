@@ -1,0 +1,318 @@
+-- Q7
+SELECT 
+    L.Name AS LocationName,
+    L.Address,
+    L.City,
+    L.Province,
+    L.PostalCode,
+    L.PhoneNumber,
+    L.WebAddress,
+    L.Type AS LocationType,
+    L.MaxCapacity AS Capacity,
+    CONCAT(CI.FirstName, ' ', CI.LastName) AS GeneralManagerName,
+    COUNT(CM.MemberID) AS NumOfClubMembers
+FROM 
+    Locations L
+JOIN 
+    Personnel P ON P.LocationID = L.LocationID
+JOIN 
+    CommonInfo CI ON CI.CommonID = P.CommonID
+LEFT JOIN 
+    ClubMembers CM ON CM.LocationID = L.LocationID
+GROUP BY 
+    L.LocationID, CI.FirstName, CI.LastName
+ORDER BY 
+    L.Province ASC, L.City ASC;
+    
+    
+    
+-- Q8
+SELECT 
+    -- Primary Family Member Details
+    FM.FamilyMemberID AS PrimaryFamilyMemberID,
+    
+    -- Associated Location Details
+    L.Name AS LocationName,
+
+    -- Secondary Family Member Details
+    C2.FirstName AS SecondaryFirstName,
+    C2.LastName AS SecondaryLastName,
+    C2.PhoneNumber AS SecondaryPhoneNumber,
+
+    -- Club Member Details
+    CM.MemberID AS ClubMembershipNumber,
+    C3.FirstName AS ClubMemberFirstName,
+    C3.LastName AS ClubMemberLastName,
+    C3.DateOfBirth AS ClubMemberDOB,
+    C3.SSN AS ClubMemberSSN,
+    C3.MedicareCardNumber AS ClubMemberMedicareCard,
+    C3.PhoneNumber AS ClubMemberPhoneNumber,
+    C3.Address AS ClubMemberAddress,
+    C3.City AS ClubMemberCity,
+    C3.Province AS ClubMemberProvince,
+    C3.PostalCode AS ClubMemberPostalCode,
+
+    -- Relationship of the Club Member with the Secondary Family Member
+    SFM.Relationship AS SecondaryFamilyRelationship
+
+FROM FamilyMembers FM
+LEFT JOIN Locations L ON FM.LocationID = L.LocationID
+
+-- Join Secondary Family Members
+LEFT JOIN SecondaryFamilyMembers SFM ON SFM.PrimaryFamilyMemberID = FM.FamilyMemberID
+LEFT JOIN CommonInfo C2 ON SFM.CommonID = C2.CommonID -- Get secondary family member details
+
+-- Join Club Members Associated with the Family Member
+LEFT JOIN ClubMembers CM ON CM.FamilyMemberID = FM.FamilyMemberID
+LEFT JOIN CommonInfo C3 ON CM.CommonID = C3.CommonID -- Get club member details
+
+WHERE FM.FamilyMemberID = 3
+
+ORDER BY L.Name, C3.LastName, C3.FirstName;
+
+
+
+-- Q9 
+
+SELECT 
+    TF.SessionDate AS StartDay,
+    TF.StartTime,
+    TF.Address AS SessionAddress,
+    ST.Type AS SessionType,
+    
+    -- Head Coach Details
+    C1.FirstName AS HeadCoachFirstName,
+    C1.LastName AS HeadCoachLastName,
+
+    -- Team and Score Details
+    COALESCE(T1.TeamName, T2.TeamName) AS TeamName,
+    CASE 
+        WHEN IFNULL(TF.SessionDate, '9999-12-31') > CURDATE() THEN NULL 
+        ELSE TF.Team1Score 
+    END AS Team1Score,
+    CASE 
+        WHEN IFNULL(TF.SessionDate, '9999-12-31') > CURDATE() THEN NULL 
+        ELSE TF.Team2Score 
+    END AS Team2Score,
+
+    -- Player Details
+    C2.FirstName AS PlayerFirstName,
+    C2.LastName AS PlayerLastName,
+    PR.RoleName AS PlayerRole
+
+FROM TeamFormations TF
+JOIN SessionTypes ST ON TF.SessionTypeID = ST.SessionTypeID
+
+-- Get Team 1 & 2 Details
+LEFT JOIN Teams T1 ON TF.Team1ID = T1.TeamID
+LEFT JOIN Teams T2 ON TF.Team2ID = T2.TeamID
+JOIN Locations L ON T1.LocationID = L.LocationID OR T2.LocationID = L.LocationID
+
+-- Get Head Coach Information
+JOIN Personnel P ON P.LocationID = L.LocationID AND P.Role IN ('Coach', 'Head Coach', 'Assistant Coach')
+JOIN CommonInfo C1 ON P.CommonID = C1.CommonID
+
+-- Get Players & Their Roles
+JOIN TeamFormationPlayers TFP ON TFP.FormationID = TF.FormationID AND (TFP.TeamID = T1.TeamID OR TFP.TeamID = T2.TeamID)
+JOIN ClubMembers CM ON TFP.MemberID = CM.MemberID
+JOIN CommonInfo C2 ON CM.CommonID = C2.CommonID
+JOIN PlayerRoles PR ON TFP.RoleID = PR.RoleID
+
+WHERE 
+    L.LocationID IN (SELECT DISTINCT LocationID FROM Teams)
+    AND TF.SessionDate BETWEEN '2025-03-01' AND '2025-03-14'
+
+ORDER BY 
+    TF.SessionDate ASC, 
+    TF.StartTime ASC;
+    
+    
+    
+-- 10
+SELECT 
+    cm.MemberID AS ClubMembershipNumber,
+    ci.FirstName,
+    ci.LastName
+FROM 
+    ClubMembers cm
+JOIN 
+    CommonInfo ci ON ci.CommonID = cm.CommonID
+JOIN 
+    ClubMembers_Locations cml ON cml.MemberID = cm.MemberID
+JOIN 
+    Memberships m ON m.MemberID = cm.MemberID
+WHERE 
+    m.Status = 'Active'  -- Ensure that the member is currently active
+    AND (2025 - m.Year) <= 3  -- Ensure they have been members for at most 3 years
+GROUP BY 
+    cm.MemberID, ci.FirstName, ci.LastName
+HAVING 
+    COUNT(DISTINCT cml.LocationID) >= 3  -- Ensure that the member is associated with at least 3 distinct locations
+ORDER BY 
+    cm.MemberID ASC;  -- Sort results by club membership number in ascending order
+
+
+-- 11
+
+
+SELECT 
+    l.Name AS LocationName,
+    COUNT(DISTINCT CASE WHEN tf.SessionTypeID = (SELECT SessionTypeID FROM SessionTypes WHERE Type = 'Training') THEN tf.FormationID END) AS TotalTrainingSessions,
+    COUNT(DISTINCT CASE WHEN tf.SessionTypeID = (SELECT SessionTypeID FROM SessionTypes WHERE Type = 'Training') THEN CONCAT(tfp.MemberID, '-', tf.FormationID) END) AS TotalPlayersInTrainingSessions,
+    COUNT(DISTINCT CASE WHEN tf.SessionTypeID = (SELECT SessionTypeID FROM SessionTypes WHERE Type = 'Game') THEN tf.FormationID END) AS TotalGameSessions,
+    COUNT(DISTINCT CASE WHEN tf.SessionTypeID = (SELECT SessionTypeID FROM SessionTypes WHERE Type = 'Game') THEN CONCAT(tfp.MemberID, '-', tf.FormationID) END) AS TotalPlayersInGameSessions
+FROM TeamFormations tf
+JOIN Locations l ON tf.LocationID = l.LocationID
+LEFT JOIN TeamFormationPlayers tfp ON tf.FormationID = tfp.FormationID
+WHERE tf.SessionDate BETWEEN '2025-01-01' AND '2025-03-31'
+GROUP BY l.LocationID
+ORDER BY TotalGameSessions DESC;
+
+
+-- Q12
+SELECT 
+    cm.MemberID AS MembershipNumber,
+    ci.FirstName,
+    ci.LastName,
+    TIMESTAMPDIFF(YEAR, ci.DateOfBirth, CURDATE()) AS Age,
+    m.Year AS DateOfJoining,
+    ci.PhoneNumber,
+    ci.Email,
+    loc.Name AS CurrentLocationName
+FROM ClubMembers cm
+JOIN CommonInfo ci ON cm.CommonID = ci.CommonID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+LEFT JOIN Locations loc ON cm.LocationID = loc.LocationID
+LEFT JOIN TeamFormationPlayers tfp ON cm.MemberID = tfp.MemberID
+WHERE m.Status = 'Active' AND tfp.MemberID IS NULL
+ORDER BY loc.Name ASC, cm.MemberID ASC;
+
+-- Q 13
+SELECT 
+    cm.MemberID AS MembershipNumber,
+    ci.FirstName,
+    ci.LastName,
+    TIMESTAMPDIFF(YEAR, ci.DateOfBirth, CURDATE()) AS Age,
+    ci.PhoneNumber,
+    ci.Email,
+    loc.Name AS CurrentLocationName
+FROM ClubMembers cm
+JOIN CommonInfo ci ON cm.CommonID = ci.CommonID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+LEFT JOIN Locations loc ON cm.LocationID = loc.LocationID
+WHERE m.Status = 'Active' 
+AND cm.MemberID IN (
+    SELECT tfp.MemberID 
+    FROM TeamFormationPlayers tfp
+    JOIN PlayerRoles pr ON tfp.RoleID = pr.RoleID
+    WHERE pr.RoleName = 'Outside Hitter'
+    GROUP BY tfp.MemberID
+    HAVING COUNT(DISTINCT pr.RoleName) = 1
+)
+ORDER BY loc.Name ASC, cm.MemberID ASC;
+
+
+
+-- Q14
+
+SELECT 
+    cm.MemberID AS MembershipNumber,
+    ci.FirstName,
+    ci.LastName,
+    TIMESTAMPDIFF(YEAR, ci.DateOfBirth, CURDATE()) AS Age,
+    ci.PhoneNumber,
+    ci.Email,
+    loc.Name AS CurrentLocationName
+FROM ClubMembers cm
+JOIN CommonInfo ci ON cm.CommonID = ci.CommonID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+LEFT JOIN ClubMembers_Locations cml ON cm.MemberID = cml.MemberID AND cml.Current_location = TRUE
+LEFT JOIN Locations loc ON cml.LocationID = loc.LocationID
+WHERE m.Status = 'Active' 
+AND cm.MemberID IN (
+    SELECT tfp.MemberID
+    FROM TeamFormationPlayers tfp
+    JOIN TeamFormations tf ON tfp.FormationID = tf.FormationID
+    JOIN PlayerRoles pr ON tfp.RoleID = pr.RoleID
+    JOIN SessionTypes st ON tf.SessionTypeID = st.SessionTypeID
+    WHERE st.Type = 'Game'
+    GROUP BY tfp.MemberID
+    HAVING COUNT(DISTINCT pr.RoleName) = (SELECT COUNT(*) FROM PlayerRoles)
+)
+ORDER BY loc.Name ASC, cm.MemberID ASC;
+
+
+
+-- Q 15
+SELECT 
+    ci.FirstName,
+    ci.LastName,
+    ci.PhoneNumber
+FROM FamilyMembers fm
+JOIN CommonInfo ci ON fm.CommonID = ci.CommonID
+JOIN ClubMembers cm ON fm.FamilyMemberID = cm.FamilyMemberID
+JOIN Memberships m ON cm.MemberID = m.MemberID
+JOIN Personnel p ON cm.LocationID = p.LocationID
+JOIN TeamFormationPlayers tfp ON cm.MemberID = tfp.MemberID
+JOIN TeamFormations tf ON tfp.FormationID = tf.FormationID
+JOIN Locations loc ON tf.LocationID = loc.LocationID
+JOIN PlayerRoles pr ON tfp.RoleID = pr.RoleID
+WHERE m.Status = 'Active' 
+AND p.Role = 'Captain'
+AND cm.LocationID = tf.LocationID
+GROUP BY fm.FamilyMemberID
+ORDER BY ci.LastName, ci.FirstName;
+
+
+-- Q 16
+
+-- Q17
+
+SELECT 
+    ci.FirstName,
+    ci.LastName,
+    MIN(pa.PeriodID) AS StartDateAsTreasurer,  -- Start date is the first period where they were assigned as Treasurer
+    MAX(pa.PeriodID) AS LastDateAsTreasurer   -- Last date is the most recent period they were assigned as Treasurer (null for current)
+FROM 
+    Personnel p
+JOIN 
+    CommonInfo ci ON p.CommonID = ci.CommonID
+JOIN 
+    Personnel_Assignments pa ON p.PersonnelID = pa.PersonnelID
+WHERE 
+    p.Role = 'Treasurer'
+GROUP BY 
+    ci.FirstName, ci.LastName
+ORDER BY 
+    ci.FirstName ASC, ci.LastName ASC, StartDateAsTreasurer ASC;
+
+-- Q18
+
+
+SELECT 
+    c.FirstName,
+    c.LastName,
+    c.PhoneNumber,
+    c.Email,
+    l.Name AS LastLocationName,
+    IF(m.Deactivation = 1, 'Deactivated', 'Active') AS Status
+FROM 
+    ClubMembers cm
+JOIN 
+    CommonInfo c ON cm.CommonID = c.CommonID
+JOIN 
+    Memberships m ON cm.MemberID = m.MemberID
+JOIN 
+    ClubMembers_Locations cl ON cm.MemberID = cl.MemberID
+JOIN 
+    Locations l ON cl.LocationID = l.LocationID
+WHERE 
+    m.Deactivation = 1
+ORDER BY 
+    l.Name ASC,
+    c.FirstName ASC,
+    c.LastName ASC;
+
+
+
+
